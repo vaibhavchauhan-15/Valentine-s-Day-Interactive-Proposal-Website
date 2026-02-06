@@ -1,0 +1,275 @@
+Valentine’s Day Interactive Proposal Website
+
+Product Requirement Document (PRD)
+
+1. Product Overview
+
+A romantic, interactive one-page website designed to ask your girlfriend to be your Valentine through playful questions, animations, and smooth transitions.
+
+The experience should feel:
+
+Romantic
+
+Playful
+
+Personalized
+
+Smooth and modern
+
+Mobile-first
+
+2. Core User Flow
+Step-by-step Experience
+
+Opening Screen
+
+A gift box in the center.
+
+Text: “Tap here”
+
+When clicked:
+
+Gift box opens with animation.
+
+Transition to landing page.
+
+Landing Page
+
+Text:
+“Will you be my Valentine?”
+
+Two buttons:
+
+Yes
+
+No
+
+If user clicks “No”
+
+Button moves away randomly.
+
+Each attempt makes it harder to click.
+
+Optional: cute messages appear:
+
+“Are you sure?”
+
+“Think again!”
+
+“Don’t break my heart…”
+
+If user clicks “Yes”
+
+Heart-shaped door animation opens.
+
+Transition to next question.
+
+Second Question
+Text:
+“What would you like for Valentine’s Day?”
+
+Options:
+
+Romantic Movie Date
+
+Romantic Dinner Date
+
+Romantic Long Drive
+
+Romantic Camping Date
+
+3. Interaction Logic for Options
+3.1 Romantic Movie Date
+
+Button moves slightly when clicked.
+
+Shows message:
+“Let’s find the perfect movie together!”
+
+3.2 Romantic Dinner Date
+
+Heart shower animation.
+
+Table booking tick animation appears.
+
+Text:
+“Table booked for two!”
+
+3.3 Romantic Long Drive
+
+Car animation drives across screen.
+
+Message:
+“Road trip with you sounds perfect.”
+
+3.4 Romantic Camping Date
+
+Tent animation appears.
+
+Stars twinkle in background.
+
+Message:
+“Under the stars, just us.”
+
+4. Extra Features (Recommended Enhancements)
+4.1 Love Meter
+
+Animated heart progress bar.
+
+Fills up as interactions happen.
+
+4.2 Final Screen
+
+After selection:
+
+Message:
+“Can’t wait to spend Valentine’s Day with you ❤️”
+
+Floating hearts animation.
+
+Optional:
+
+Play romantic background music.
+
+4.3 Personalization (Optional)
+
+Allow input:
+
+Her name
+
+Custom message
+
+Special date
+
+5. Design Requirements
+5.1 Theme
+
+Valentine’s color palette:
+
+Soft pink (#FFC0CB)
+
+Deep red (#FF4D6D)
+
+White
+
+Light lavender accents
+
+5.2 Typography
+
+Heading: Romantic cursive or serif
+
+Body: Clean modern sans-serif
+
+Example:
+
+Headings: Playfair Display or Great Vibes
+
+Body: Poppins or Inter
+
+5.3 UI Style
+
+Rounded corners
+
+Glassmorphism cards
+
+Soft shadows
+
+Gradient backgrounds
+
+6. Animation & Transitions
+Global Animations
+
+Fade-in sections
+
+Floating hearts in background
+
+Button hover glow
+
+Key Animations
+Element	Animation
+Gift box	Open with bounce
+Heart door	Split open like doors
+No button	Escape on hover
+Dinner option	Heart shower
+Camping	Twinkling stars
+Final screen	Confetti hearts
+7. Technical Requirements
+7.1 Tech Stack (Best Choice)
+
+Frontend Only (No backend needed)
+
+Layer	Technology
+Framework	React + Vite or Next.js
+Styling	Tailwind CSS
+Animations	Framer Motion
+Icons	Lucide or Heroicons
+Deployment	Vercel / Netlify
+Simpler Alternative
+
+
+8. Responsive Design
+
+Must support:
+
+Device	Requirement
+Mobile	Primary design target
+Tablet	Adaptive layout
+Desktop	Centered romantic card layout
+
+Rules:
+
+Large touch buttons
+
+Smooth scrolling
+
+No horizontal overflow
+
+9. Performance Requirements
+
+Page load under 2 seconds
+
+Lightweight animations
+
+No heavy libraries
+
+Optimized assets
+
+10. File Structure (Recommended)
+valentine-site/
+│
+├── index.html
+├── styles/
+│   └── main.css
+├── scripts/
+│   └── app.js
+├── assets/
+│   ├── heart.svg
+│   ├── gift.svg
+│   └── icons/
+
+
+12. Deployment
+
+Options:
+
+Vercel (recommended)
+
+Netlify
+
+GitHub Pages
+
+Share link with her:
+
+yourname-valentine.vercel.app
+
+13. Success Criteria
+
+The site should:
+
+Work smoothly on mobile.
+
+Feel romantic and playful.
+
+Load fast.
+
+Be simple but memorable.
