@@ -163,21 +163,6 @@ const ValentineQuestion = memo(({ onYes }) => {
           Will you be my Valentine? 💝
         </motion.h1>
 
-        {/* Cute message display */}
-        <AnimatePresence mode="wait">
-          {noAttempts > 0 && (
-            <motion.p
-              key={noAttempts}
-              initial={{ opacity: 0, y: -20, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.9 }}
-              className="text-center text-base sm:text-lg md:text-xl text-deep-rose mb-4 sm:mb-6 font-semibold px-2 relative z-10"
-            >
-              {cuteMessages[Math.min(noAttempts - 1, cuteMessages.length - 1)]}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
         {/* Buttons */}
         <motion.div 
           variants={itemVariants}
