@@ -26,7 +26,21 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full overflow-hidden relative bg-gradient-to-br from-pink-200 via-valentine-lavender to-valentine-pink">
+    <div className="min-h-screen h-screen w-full overflow-hidden relative bg-gradient-to-br from-pink-200 via-valentine-lavender via-50% to-valentine-pink animate-gradient-slow">
+      {/* Animated gradient overlay */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-tr from-pink-300/20 via-transparent to-purple-300/20"
+        animate={{
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: [0.22, 1, 0.36, 1]
+        }}
+        style={{ willChange: 'opacity' }}
+      />
+      
       <FloatingHearts />
       
       <AnimatePresence mode="wait">
