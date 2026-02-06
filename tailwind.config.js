@@ -10,6 +10,11 @@ export default {
         'valentine-pink': '#FFC0CB',
         'valentine-red': '#FF4D6D',
         'valentine-lavender': '#E6E6FA',
+        'deep-rose': '#B83260',
+        'blush': '#F8C8DC',
+        'warm-cream': '#FFF6EC',
+        'elegant-maroon': '#7A1E3A',
+        'soft-gold': '#C9A227',
       },
       fontFamily: {
         'romantic': ['"Playfair Display"', 'serif'],

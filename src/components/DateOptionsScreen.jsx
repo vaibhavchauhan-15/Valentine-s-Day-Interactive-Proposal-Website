@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, memo } from 'react'
 
-const DateOptionsScreen = ({ onSelect }) => {
+const DateOptionsScreen = memo(({ onSelect }) => {
   const [selectedOption, setSelectedOption] = useState(null)
   const [showAnimation, setShowAnimation] = useState(false)
   const [animationType, setAnimationType] = useState(null)
@@ -22,6 +22,7 @@ const DateOptionsScreen = ({ onSelect }) => {
     {
       id: 'movie',
       title: '🎬 Romantic Movie Date',
+      description: 'Cozy up with popcorn and your favorite films',
       gradient: 'from-purple-500 to-pink-500',
       message: "Let's find the perfect movie together! 🍿",
       isClickable: false,
@@ -29,13 +30,15 @@ const DateOptionsScreen = ({ onSelect }) => {
     {
       id: 'dinner',
       title: '🍽️ Romantic Dinner Date',
-      gradient: 'from-red-500 to-rose-500',
+      description: 'Candlelit dining with exquisite cuisine',
+      gradient: 'from-deep-rose to-elegant-maroon',
       message: 'Table booked for two! 🕯️',
       isClickable: true,
     },
     {
       id: 'drive',
       title: '🚗 Romantic Long Drive',
+      description: 'Scenic routes with endless conversations',
       gradient: 'from-blue-500 to-cyan-500',
       message: 'Road trip with you sounds perfect! 🛣️',
       isClickable: false,
@@ -43,6 +46,7 @@ const DateOptionsScreen = ({ onSelect }) => {
     {
       id: 'camping',
       title: '⛺ Romantic Camping Date',
+      description: 'Stargazing under the moonlight',
       gradient: 'from-green-500 to-teal-500',
       message: 'Under the stars, just us! ✨',
       isClickable: false,
@@ -93,6 +97,14 @@ const DateOptionsScreen = ({ onSelect }) => {
     }
     
     setSelectedOption(option.id)
+    
+    // If dinner is selected, immediately transition to platter screen
+    if (option.id === 'dinner') {
+      onSelect(option.id)
+      return
+    }
+    
+    // For other options, show animation first
     setAnimationType(option.id)
     setShowAnimation(true)
     
@@ -112,81 +124,7 @@ const DateOptionsScreen = ({ onSelect }) => {
     >
       {/* Animations for different options */}
       <AnimatePresence>
-        {showAnimation && animationType === 'dinner' && (
-          <div className="fixed inset-0 z-40 pointer-events-none">
-            {[...Array(40)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute text-2xl sm:text-3xl md:text-4xl drop-shadow-lg"
-                style={{
-                  left: '50%',
-                  top: '50%',
-                  willChange: 'transform, opacity',
-                  transform: 'translate3d(0,0,0)',
-                }}
-                initial={{ scale: 0, x: 0, y: 0, rotate: 0 }}
-                animate={{
-                  scale: [0, 1.1, 0.8],
-                  x: (Math.random() - 0.5) * (typeof window !== 'undefined' && window.innerWidth < 640 ? 500 : 900),
-                  y: Math.random() * -500 - 150,
-                  rotate: Math.random() * 720 - 360,
-                  opacity: [0, 1, 0.8, 0],
-                }}
-                transition={{
-                  duration: 2.2,
-                  delay: i * 0.03,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                {['❤️', '💕', '💖', '💗'][i % 4]}
-              </motion.div>
-            ))}
-            
-            {/* Table booking tick with enhanced animation */}
-            <motion.div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: [0, 1.4, 1], rotate: 0 }}
-              transition={{ delay: 0.8, duration: 0.5, type: "spring", stiffness: 200 }}
-              style={{ willChange: 'transform' }}
-            >
-              <div className="bg-white rounded-full p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-pink-200/50 to-valentine-red/20"
-                  animate={{
-                    scale: [1, 1.4, 1],
-                    opacity: [0.3, 0.6, 0.3],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  style={{ willChange: 'transform, opacity' }}
-                />
-                <svg
-                  width="100"
-                  height="100"
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="relative z-10"
-                >
-                  <motion.path
-                    d="M20 50 L40 70 L80 30"
-                    stroke="#FF4D6D"
-                    strokeWidth="10"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 1.3, duration: 0.5, ease: "easeOut" }}
-                  />
-                </svg>
-              </div>
-            </motion.div>
-          </div>
-        )}
+        {/* Dinner animation removed - using PlatterTransitionScreen instead */}
 
         {showAnimation && animationType === 'drive' && (
           <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden">
@@ -339,9 +277,10 @@ const DateOptionsScreen = ({ onSelect }) => {
         />
         
         <motion.h1
-          className="text-2xl md:text-4xl font-romantic text-center text-valentine-red mb-6 md:mb-8 text-shadow-romantic relative z-10"
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          className="text-2xl md:text-4xl font-romantic text-center text-deep-rose mb-6 md:mb-8 text-shadow-romantic relative z-10 tracking-tight leading-tight"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
         >
           What would you like for Valentine's Day? 💖
         </motion.h1>
@@ -365,18 +304,10 @@ const DateOptionsScreen = ({ onSelect }) => {
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 relative min-h-[320px] overflow-visible">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 relative min-h-[320px] overflow-visible">
           {options.map((option, index) => (
-            <motion.button
+            <motion.div
               key={option.id}
-              onClick={() => handleOptionClick(option)}
-              onMouseEnter={() => !option.isClickable && handleNonClickableHover(option.id)}
-              onTouchStart={(e) => {
-                if (!option.isClickable) {
-                  e.preventDefault()
-                  handleNonClickableHover(option.id)
-                }
-              }}
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               animate={
                 !option.isClickable 
@@ -409,46 +340,107 @@ const DateOptionsScreen = ({ onSelect }) => {
                       stiffness: 100
                     }
               }
-              whileHover={option.isClickable ? { scale: 1.06, y: -8, rotate: [0, -1, 1, 0] } : {}}
-              whileTap={option.isClickable ? { scale: 0.94 } : {}}
-              disabled={selectedOption !== null && option.isClickable}
-              className={`relative bg-gradient-to-br ${option.gradient} text-white p-4 md:p-6 rounded-xl md:rounded-2xl text-base md:text-lg font-bold shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group ${
-                selectedOption !== null && option.isClickable ? 'opacity-50 cursor-not-allowed' : ''
-              } ${!option.isClickable ? 'cursor-pointer' : ''}`}
+              whileHover={option.isClickable ? { 
+                y: -12, 
+                scale: 1.03,
+                transition: { duration: 0.3, type: 'spring', stiffness: 300 }
+              } : {}}
+              whileTap={option.isClickable ? { scale: 0.97 } : {}}
+              className="relative"
             >
-              {/* Shine effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={option.isClickable ? {
-                  x: ['-200%', '200%'],
-                } : {}}
-                transition={option.isClickable ? {
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear",
-                  repeatDelay: 1,
-                } : {}}
-              />
+              {/* Special glow for dinner card */}
+              {option.id === 'dinner' && (
+                <motion.div
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-r from-soft-gold/40 via-deep-rose/40 to-elegant-maroon/40"
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.4, 0.7, 0.4],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                  style={{ filter: 'blur(20px)' }}
+                />
+              )}
               
-              <div className="flex flex-col items-center gap-2 relative z-10">
-                <span className="text-lg md:text-xl font-extrabold drop-shadow-lg">{option.title}</span>
-                {selectedOption === option.id && option.isClickable && (
-                  <motion.p
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                    className="text-xs md:text-sm font-medium"
-                  >
-                    {option.message}
-                  </motion.p>
+              <button
+                onClick={() => handleOptionClick(option)}
+                onMouseEnter={() => !option.isClickable && handleNonClickableHover(option.id)}
+                onTouchStart={(e) => {
+                  if (!option.isClickable) {
+                    e.preventDefault()
+                    handleNonClickableHover(option.id)
+                  }
+                }}
+                disabled={selectedOption !== null && option.isClickable}
+                className={`relative w-full glass-morphism p-6 md:p-8 rounded-2xl text-white shadow-lg overflow-hidden group ${
+                  selectedOption !== null && option.isClickable ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                } ${!option.isClickable ? 'cursor-pointer' : ''}`}
+                style={{
+                  background: option.isClickable 
+                    ? `linear-gradient(135deg, ${option.id === 'dinner' ? '#B83260, #7A1E3A' : '#FF4D6D, #FFC0CB'})` 
+                    : `linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))`,
+                  borderImage: option.id === 'dinner' ? 'linear-gradient(135deg, #C9A227, #B83260, #7A1E3A) 1' : 'none',
+                  borderWidth: option.id === 'dinner' ? '2px' : '1px',
+                  borderStyle: 'solid',
+                  borderColor: option.id === 'dinner' ? 'transparent' : 'rgba(255, 255, 255, 0.3)',
+                }}
+              >
+                {/* Gradient border effect */}
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: `linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent)`,
+                    padding: '2px',
+                  }}
+                />
+                
+                {/* Shine effect */}
+                {option.isClickable && (
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    animate={{
+                      x: ['-200%', '200%'],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "linear",
+                      repeatDelay: 1,
+                    }}
+                  />
                 )}
-              </div>
-            </motion.button>
+                
+                <div className="flex flex-col items-center gap-3 relative z-10">
+                  <span className="text-4xl md:text-5xl drop-shadow-2xl">{option.title.split(' ')[0]}</span>
+                  <span className="text-xl md:text-2xl font-bold drop-shadow-lg text-center tracking-wide">
+                    {option.title.split(' ').slice(1).join(' ')}
+                  </span>
+                  <p className="text-sm md:text-base opacity-90 text-center font-medium leading-relaxed px-2">
+                    {option.description}
+                  </p>
+                  
+                  {selectedOption === option.id && option.isClickable && (
+                    <motion.p
+                      initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ type: "spring", stiffness: 200 }}
+                      className="text-sm md:text-base font-semibold mt-2 bg-white/20 px-4 py-2 rounded-full"
+                    >
+                      {option.message}
+                    </motion.p>
+                  )}
+                </div>
+              </button>
+            </motion.div>
           ))}
         </div>
       </motion.div>
     </motion.div>
   )
-}
+})
+
+DateOptionsScreen.displayName = 'DateOptionsScreen'
 
 export default DateOptionsScreen

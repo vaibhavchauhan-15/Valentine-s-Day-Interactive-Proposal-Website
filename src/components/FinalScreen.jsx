@@ -1,6 +1,49 @@
 import { motion } from 'framer-motion'
+import { useState, useEffect, memo, useRef } from 'react'
 
-const FinalScreen = ({ selectedOption }) => {
+const FinalScreen = memo(({ selectedOption }) => {
+  const [displayedText, setDisplayedText] = useState('')
+  const [musicEnabled, setMusicEnabled] = useState(true)
+  const audioRef = useRef(null)
+  const fullText = "Can't wait to spend Valentine's Day with you! ❤️"
+
+  // Typewriter effect
+  useEffect(() => {
+    let currentIndex = 0
+    const interval = setInterval(() => {
+      if (currentIndex <= fullText.length) {
+        setDisplayedText(fullText.slice(0, currentIndex))
+        currentIndex++
+      } else {
+        clearInterval(interval)
+      }
+    }, 50)
+    
+    return () => clearInterval(interval)
+  }, [])
+
+  // Music control
+  useEffect(() => {
+    if (audioRef.current) {
+      if (musicEnabled) {
+        audioRef.current.play().catch(err => console.log('Audio play failed:', err))
+      } else {
+        audioRef.current.pause()
+      }
+    }
+  }, [musicEnabled])
+
+  // Auto-play music on mount
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.5
+      audioRef.current.play().catch(err => {
+        console.log('Auto-play failed:', err)
+        setMusicEnabled(false)
+      })
+    }
+  }, [])
+
   const optionMessages = {
     movie: '🎬 Movie night under the stars with you',
     dinner: '🍽️ A romantic dinner by candlelight',
@@ -11,40 +54,75 @@ const FinalScreen = ({ selectedOption }) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={{ 
+        opacity: 1, 
+        scale: [0.95, 1, 1.02, 1],
+      }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 3, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-0 flex flex-col items-center justify-center z-10 px-4"
-      style={{ willChange: 'opacity, transform' }}
     >
-      {/* Confetti Hearts - Enhanced */}
-      <div className="fixed inset-0 pointer-events-none">
-        {[...Array(30)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-2xl sm:text-3xl drop-shadow-lg"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: -50,
-              willChange: 'transform',
-              transform: 'translate3d(0,0,0)',
-            }}
-            animate={{
-              y: typeof window !== 'undefined' ? window.innerHeight + 100 : 900,
-              rotate: Math.random() * 1080 - 540,
-              x: [0, (Math.random() - 0.5) * 200, (Math.random() - 0.5) * 100],
-              scale: [0.8, 1.15, 1, 0.8],
-            }}
-            transition={{
-              duration: Math.random() * 2.5 + 3.5,
-              repeat: Infinity,
-              delay: Math.random() * 1.5,
-              ease: 'linear',
-            }}
-          >
-            {['❤️', '💕', '💖', '💗', '💝', '💘'][Math.floor(Math.random() * 6)]}
-          </motion.div>
-        ))}
+      {/* Audio element */}
+      <audio 
+        ref={audioRef} 
+        src="/song/song1.mp3" 
+        loop 
+        preload="auto"
+      />
+
+      {/* Music control button */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 2, type: 'spring', stiffness: 200 }}
+        onClick={() => setMusicEnabled(!musicEnabled)}
+        className="fixed top-8 right-8 z-50 bg-deep-rose/80 backdrop-blur-sm text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
+        whileHover={{ scale: 1.1, rotate: 10 }}
+        whileTap={{ scale: 0.95 }}
+        title={musicEnabled ? 'Music On' : 'Music Off'}
+      >
+        <span className="text-2xl">{musicEnabled ? '🔊' : '🔇'}</span>
+      </motion.button>
+
+      {/* Smooth Confetti Hearts - Optimized for performance */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(30)].map((_, i) => {
+          const delay = (i * 0.15) % 3
+          const duration = 5 + (i % 3)
+          const xOffset = (i % 5) * 20
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute text-2xl sm:text-3xl drop-shadow-lg will-change-transform"
+              style={{
+                left: `${(i * 3.3) % 100}%`,
+                top: -50,
+              }}
+              animate={{
+                y: typeof window !== 'undefined' ? window.innerHeight + 100 : 900,
+                x: [
+                  0,
+                  Math.sin(i) * 150 + xOffset,
+                  Math.cos(i) * 100 - xOffset,
+                  0
+                ],
+                rotate: [0, 180, 360, 540],
+                scale: [0.7, 1, 0.9, 0.8],
+                opacity: [0, 0.9, 0.9, 0],
+              }}
+              transition={{
+                duration,
+                repeat: Infinity,
+                delay,
+                ease: 'linear',
+                times: [0, 0.3, 0.7, 1],
+              }}
+            >
+              {['❤️', '💕', '💖', '💗', '💝', '💘'][i % 6]}
+            </motion.div>
+          )
+        })}
       </div>
 
       {/* Main Content */}
@@ -58,7 +136,6 @@ const FinalScreen = ({ selectedOption }) => {
           damping: 15,
           delay: 0.2,
         }}
-        style={{ willChange: 'transform, opacity' }}
       >
         {/* Shimmer effect */}
         <motion.div
@@ -77,7 +154,7 @@ const FinalScreen = ({ selectedOption }) => {
         <motion.div
           className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl mb-4 sm:mb-6 drop-shadow-2xl relative z-10"
           animate={{
-            scale: [1, 1.2, 1],
+            scale: [1, 1.15, 1],
             rotate: [0, 5, -5, 0],
           }}
           transition={{
@@ -85,27 +162,32 @@ const FinalScreen = ({ selectedOption }) => {
             repeat: Infinity,
             ease: [0.22, 1, 0.36, 1],
           }}
-          style={{ willChange: 'transform' }}
         >
           💝
         </motion.div>
 
-        {/* Main message */}
+        {/* Main message with typewriter effect */}
         <motion.h1
-          className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-romantic text-valentine-red mb-4 sm:mb-6 text-shadow-romantic leading-tight px-2 relative z-10"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-romantic text-deep-rose mb-4 sm:mb-6 text-shadow-romantic leading-tight tracking-tight px-2 relative z-10 min-h-[80px] sm:min-h-[100px]"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
         >
-          Can't wait to spend Valentine's Day with you! ❤️
+          {displayedText}
+          <motion.span
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 0.8, repeat: Infinity }}
+          >
+            |
+          </motion.span>
         </motion.h1>
 
         {/* Selected option message */}
         <motion.p
-          className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-body text-valentine-red mb-6 sm:mb-8 px-2 font-semibold relative z-10"
+          className="text-lg sm:text-xl md:text-2xl font-body text-deep-rose mb-6 sm:mb-8 px-2 font-semibold relative z-10 leading-relaxed"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, type: "spring", stiffness: 100 }}
+          transition={{ delay: 3, type: "spring", stiffness: 100 }}
         >
           {optionMessages[selectedOption] || '💖 An amazing day together'}
         </motion.p>
@@ -115,7 +197,7 @@ const FinalScreen = ({ selectedOption }) => {
           className="flex justify-center gap-4 sm:gap-6 mb-6 sm:mb-8 relative z-10"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.8, type: "spring", stiffness: 150 }}
+          transition={{ delay: 3.5, type: "spring", stiffness: 150 }}
         >
           {[0, 1, 2].map((i) => (
             <motion.span 
@@ -139,10 +221,10 @@ const FinalScreen = ({ selectedOption }) => {
 
         {/* Final romantic message */}
         <motion.p
-          className="text-base sm:text-lg md:text-xl lg:text-2xl font-body text-gray-700 italic px-4 relative z-10"
+          className="text-base sm:text-lg md:text-xl font-body text-gray-700 italic px-4 relative z-10 leading-relaxed"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1, type: "spring", stiffness: 100 }}
+          transition={{ delay: 4, type: "spring", stiffness: 100 }}
         >
           "Every moment with you is my favorite moment" 💕
         </motion.p>
@@ -217,6 +299,8 @@ const FinalScreen = ({ selectedOption }) => {
       </motion.div>
     </motion.div>
   )
-}
+})
+
+FinalScreen.displayName = 'FinalScreen'
 
 export default FinalScreen

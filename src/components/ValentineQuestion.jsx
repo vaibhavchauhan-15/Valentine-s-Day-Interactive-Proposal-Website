@@ -1,10 +1,12 @@
-import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef, memo } from 'react'
 
-const ValentineQuestion = ({ onYes }) => {
+const ValentineQuestion = memo(({ onYes }) => {
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 })
   const [noAttempts, setNoAttempts] = useState(0)
   const [showHeartDoor, setShowHeartDoor] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
+  const noButtonRef = useRef(null)
 
   const cuteMessages = [
     "Are you sure? 🥺",
@@ -17,16 +19,58 @@ const ValentineQuestion = ({ onYes }) => {
     "I promise it'll be fun! 🎉",
   ]
 
-  const handleNoHover = () => {
-    // Increase movement range with each attempt to make it progressively harder
-    const baseRange = 200
-    const multiplier = 1 + (noAttempts * 0.3)
-    const range = baseRange * multiplier
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
+    },
+    exit: { opacity: 0, scale: 0.9 }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 15
+      }
+    }
+  }
+
+  const handleNoHover = (e) => {
+    // Intelligent cursor-aware movement
+    const button = noButtonRef.current
+    if (!button) return
+
+    const rect = button.getBoundingClientRect()
+    const buttonCenterX = rect.left + rect.width / 2
+    const buttonCenterY = rect.top + rect.height / 2
     
-    const randomX = Math.random() * range - range / 2
-    const randomY = Math.random() * range - range / 2
+    // Calculate direction away from cursor
+    const angle = Math.atan2(
+      buttonCenterY - e.clientY,
+      buttonCenterX - e.clientX
+    )
+    
+    // Increase distance with each attempt
+    const baseRange = 180
+    const multiplier = 1 + (noAttempts * 0.4)
+    const distance = baseRange * multiplier
+    
+    const randomX = Math.cos(angle) * distance + (Math.random() - 0.5) * 40
+    const randomY = Math.sin(angle) * distance + (Math.random() - 0.5) * 40
+    
     setNoPosition({ x: randomX, y: randomY })
     setNoAttempts(prev => prev + 1)
+    setShowTooltip(true)
+    setTimeout(() => setShowTooltip(false), 2000)
   }
 
   const handleNoClick = (e) => {
@@ -43,12 +87,12 @@ const ValentineQuestion = ({ onYes }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-0 flex flex-col items-center justify-center z-10 px-4"
-      style={{ willChange: 'opacity' }}
     >
       {/* Heart Door Animation */}
       {showHeartDoor && (
@@ -97,15 +141,7 @@ const ValentineQuestion = ({ onYes }) => {
       {/* Main Content */}
       <motion.div
         className="glass-morphism rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl max-w-2xl w-full mx-4 relative overflow-hidden"
-        initial={{ scale: 0.8, y: 50, opacity: 0 }}
-        animate={{ scale: 1, y: 0, opacity: 1 }}
-        transition={{ 
-          type: 'spring', 
-          stiffness: 100,
-          damping: 15,
-          delay: 0.1
-        }}
-        style={{ willChange: 'transform, opacity' }}
+        variants={itemVariants}
       >
         {/* Shimmer effect */}
         <motion.div
@@ -121,35 +157,46 @@ const ValentineQuestion = ({ onYes }) => {
         />
         {/* Title */}
         <motion.h1
-          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-romantic text-center text-valentine-red mb-6 sm:mb-8 text-shadow-romantic leading-tight relative z-10"
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: [0.22, 1, 0.36, 1] }}
-          style={{ willChange: 'transform' }}
+          variants={itemVariants}
+          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-romantic text-center text-deep-rose mb-6 sm:mb-8 text-shadow-romantic leading-tight tracking-tight"
         >
           Will you be my Valentine? 💝
         </motion.h1>
 
         {/* Cute message display */}
-        {noAttempts > 0 && (
-          <motion.p
-            initial={{ opacity: 0, y: -20, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-center text-base sm:text-lg md:text-xl text-valentine-red mb-4 sm:mb-6 font-semibold px-2 relative z-10"
-          >
-            {cuteMessages[Math.min(noAttempts - 1, cuteMessages.length - 1)]}
-          </motion.p>
-        )}
+        <AnimatePresence mode="wait">
+          {noAttempts > 0 && (
+            <motion.p
+              key={noAttempts}
+              initial={{ opacity: 0, y: -20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.9 }}
+              className="text-center text-base sm:text-lg md:text-xl text-deep-rose mb-4 sm:mb-6 font-semibold px-2 relative z-10"
+            >
+              {cuteMessages[Math.min(noAttempts - 1, cuteMessages.length - 1)]}
+            </motion.p>
+          )}
+        </AnimatePresence>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center relative min-h-[120px] sm:min-h-[140px] w-full px-2">
+        <motion.div 
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center relative min-h-[120px] sm:min-h-[140px] w-full px-2"
+        >
           {/* Yes Button */}
           <motion.button
             onClick={handleYesClick}
-            whileHover={{ scale: 1.08, y: -3, transition: { duration: 0.2 } }}
-            whileTap={{ scale: 0.92, transition: { duration: 0.1 } }}
-            className="relative bg-gradient-to-r from-valentine-red via-pink-500 to-pink-600 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl hover:shadow-valentine-red/50 transition-all duration-300 z-10 touch-manipulation min-w-[140px] overflow-hidden group"
-            style={{ willChange: 'transform' }}
+            whileHover={{ 
+              scale: 1.08, 
+              y: -5,
+              boxShadow: "0 15px 40px rgba(184, 50, 96, 0.4)",
+              transition: { duration: 0.2, type: 'spring', stiffness: 300 } 
+            }}
+            whileTap={{ 
+              scale: 0.95,
+              transition: { duration: 0.1 }
+            }}
+            className="relative bg-gradient-to-r from-deep-rose via-valentine-red to-elegant-maroon text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl transition-all duration-300 z-10 touch-manipulation min-w-[140px] overflow-hidden group"
           >
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
@@ -167,26 +214,59 @@ const ValentineQuestion = ({ onYes }) => {
             </span>
           </motion.button>
 
-          {/* No Button - Moves away */}
-          <motion.button
-            onMouseEnter={handleNoHover}
-            onTouchStart={handleNoHover}
-            onClick={handleNoClick}
-            animate={{
-              x: noPosition.x,
-              y: noPosition.y,
-            }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            style={{ position: 'relative', willChange: 'transform' }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-lg cursor-pointer hover:from-gray-500 hover:to-gray-600 transition-all touch-manipulation min-w-[140px]"
-          >
-            No 😢
-          </motion.button>
-        </div>
+          {/* No Button - Moves away with rotation and tooltip */}
+          <div className="relative">
+            <motion.button
+              ref={noButtonRef}
+              onMouseEnter={handleNoHover}
+              onTouchStart={(e) => {
+                const touch = e.touches[0]
+                handleNoHover({ clientX: touch.clientX, clientY: touch.clientY })
+              }}
+              onClick={handleNoClick}
+              animate={{
+                x: noPosition.x,
+                y: noPosition.y,
+                rotate: noPosition.x * 0.1, // Subtle rotation based on x movement
+              }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 300, 
+                damping: 20,
+                rotate: { duration: 0.3 }
+              }}
+              style={{ position: 'relative' }}
+              whileHover={{ 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+              className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-lg cursor-pointer hover:from-gray-500 hover:to-gray-600 transition-all touch-manipulation min-w-[140px]"
+            >
+              No 😢
+            </motion.button>
+            
+            {/* Tooltip */}
+            <AnimatePresence>
+              {showTooltip && noAttempts > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-deep-rose text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap shadow-lg"
+                >
+                  {cuteMessages[Math.min(noAttempts - 1, cuteMessages.length - 1)]}
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-deep-rose" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
 
         {/* Heart decorations */}
-        <div className="flex justify-center gap-2 sm:gap-4 mt-6 sm:mt-8 relative z-10">
+        <motion.div 
+          variants={itemVariants}
+          className="flex justify-center gap-2 sm:gap-4 mt-6 sm:mt-8 relative z-10"
+        >
           {[...Array(5)].map((_, i) => (
             <motion.span
               key={i}
@@ -202,15 +282,16 @@ const ValentineQuestion = ({ onYes }) => {
                 delay: i * 0.15,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              style={{ willChange: 'transform' }}
             >
               💕
             </motion.span>
           ))}
-        </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   )
-}
+})
+
+ValentineQuestion.displayName = 'ValentineQuestion'
 
 export default ValentineQuestion
