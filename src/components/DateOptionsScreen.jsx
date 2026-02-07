@@ -252,9 +252,9 @@ const DateOptionsScreen = memo(({ onSelect }) => {
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
+      {/* Main Content - Enhanced with ornate romantic styling */}
       <motion.div
-        className="glass-morphism rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl max-w-2xl w-full relative overflow-hidden"
+        className="glass-romantic rounded-[2rem] p-6 md:p-8 lg:p-10 shadow-2xl max-w-2xl w-full relative overflow-hidden border-2 border-white/50 paper-texture"
         initial={{ scale: 0.8, y: 50, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         transition={{ 
@@ -263,9 +263,16 @@ const DateOptionsScreen = memo(({ onSelect }) => {
           delay: 0.2
         }}
       >
-        {/* Shimmer effect */}
+        {/* Lace pattern overlay */}
+        <div className="absolute inset-0 lace-pattern opacity-25 pointer-events-none" />
+        
+        {/* Enhanced shimmer effect */}
         <motion.div
-          className="absolute inset-0 shimmer opacity-20"
+          className="absolute inset-0 opacity-15"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
+            backgroundSize: '200% 100%',
+          }}
           animate={{
             backgroundPosition: ['-200% 0', '200% 0'],
           }}
@@ -276,13 +283,48 @@ const DateOptionsScreen = memo(({ onSelect }) => {
           }}
         />
         
+        {/* Ornate corner flourishes */}
+        {[
+          { corner: 'top-3 left-3', rotate: 0 },
+          { corner: 'top-3 right-3', rotate: 90 },
+          { corner: 'bottom-3 left-3', rotate: -90 },
+          { corner: 'bottom-3 right-3', rotate: 180 },
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.2, scale: 1 }}
+            transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
+            className={`absolute ${item.corner} text-3xl text-romantic-400 pointer-events-none`}
+            style={{ rotate: `${item.rotate}deg` }}
+          >
+            ❦
+          </motion.div>
+        ))}
+        
+        {/* Elegant decorative dividers */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent"
+        />
+        
         <motion.h1
-          className="text-2xl md:text-4xl font-romantic text-center text-deep-rose mb-6 md:mb-8 text-shadow-romantic relative z-10 tracking-tight leading-tight"
+          className="text-2xl md:text-4xl lg:text-5xl font-romantic font-bold text-center text-deep-rose mb-6 md:mb-8 text-shadow-glow relative z-10 tracking-tight leading-tight italic px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
         >
-          What would you like for Valentine's Day? 💖
+          What would you like for Valentine's Day?
+          <motion.span
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.8, type: 'spring', stiffness: 150 }}
+            className="inline-block ml-2 text-4xl"
+          >
+            💖
+          </motion.span>
         </motion.h1>
 
         {/* Cute message display for non-clickable options */}
@@ -348,21 +390,48 @@ const DateOptionsScreen = memo(({ onSelect }) => {
               whileTap={option.isClickable ? { scale: 0.97 } : {}}
               className="relative"
             >
-              {/* Special glow for dinner card */}
+              {/* Enhanced glow for dinner card */}
               {option.id === 'dinner' && (
-                <motion.div
-                  className="absolute inset-0 rounded-2xl bg-gradient-to-r from-soft-gold/40 via-deep-rose/40 to-elegant-maroon/40"
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    opacity: [0.4, 0.7, 0.4],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'easeInOut'
-                  }}
-                  style={{ filter: 'blur(20px)' }}
-                />
+                <>
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-soft-gold/50 via-deep-rose/50 to-elegant-maroon/50"
+                    animate={{
+                      scale: [1, 1.08, 1],
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                    style={{ filter: 'blur(25px)', zIndex: -1 }}
+                  />
+                  
+                  {/* Golden sparkles for dinner option */}
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute text-xl"
+                      style={{
+                        top: `${20 + i * 30}%`,
+                        right: '-10px',
+                      }}
+                      animate={{
+                        opacity: [0, 1, 0],
+                        x: [0, 10],
+                        rotate: [0, 180],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: i * 0.6,
+                        ease: "easeOut"
+                      }}
+                    >
+                      ✨
+                    </motion.div>
+                  ))}
+                </>
               )}
               
               <button

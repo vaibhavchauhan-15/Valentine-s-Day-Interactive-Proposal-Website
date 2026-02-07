@@ -70,18 +70,22 @@ const FinalScreen = memo(({ selectedOption }) => {
         preload="auto"
       />
 
-      {/* Music control button */}
+      {/* Enhanced Music control button */}
       <motion.button
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 2, type: 'spring', stiffness: 200 }}
         onClick={() => setMusicEnabled(!musicEnabled)}
-        className="fixed top-8 right-8 z-50 bg-deep-rose/80 backdrop-blur-sm text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
-        whileHover={{ scale: 1.1, rotate: 10 }}
-        whileTap={{ scale: 0.95 }}
+        className="fixed top-8 right-8 z-50 bg-gradient-to-r from-deep-rose to-valentine-red backdrop-blur-md text-white p-4 rounded-full shadow-2xl border-2 border-white/30"
+        whileHover={{ 
+          scale: 1.15, 
+          rotate: 15,
+          boxShadow: "0 10px 30px rgba(184, 50, 96, 0.5)"
+        }}
+        whileTap={{ scale: 0.9 }}
         title={musicEnabled ? 'Music On' : 'Music Off'}
       >
-        <span className="text-2xl">{musicEnabled ? '🔊' : '🔇'}</span>
+        <span className="text-2xl drop-shadow-lg">{musicEnabled ? '🔊' : '🔇'}</span>
       </motion.button>
 
       {/* Smooth Confetti Hearts - Optimized for performance */}
@@ -125,9 +129,9 @@ const FinalScreen = memo(({ selectedOption }) => {
         })}
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Enhanced with ornate romantic styling */}
       <motion.div
-        className="glass-morphism rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-16 shadow-2xl max-w-3xl w-full text-center relative z-10 mx-4 overflow-hidden"
+        className="glass-romantic rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 md:p-12 lg:p-16 shadow-2xl max-w-3xl w-full text-center relative z-10 mx-4 overflow-hidden border-2 border-white/50 paper-texture"
         initial={{ scale: 0, rotate: -10, opacity: 0 }}
         animate={{ scale: 1, rotate: 0, opacity: 1 }}
         transition={{
@@ -137,9 +141,16 @@ const FinalScreen = memo(({ selectedOption }) => {
           delay: 0.2,
         }}
       >
-        {/* Shimmer effect */}
+        {/* Lace pattern overlay */}
+        <div className="absolute inset-0 lace-pattern opacity-20 pointer-events-none" />
+        
+        {/* Enhanced shimmer effect */}
         <motion.div
-          className="absolute inset-0 shimmer opacity-30"
+          className="absolute inset-0 opacity-15"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
+            backgroundSize: '200% 100%',
+          }}
           animate={{
             backgroundPosition: ['-200% 0', '200% 0'],
           }}
@@ -150,47 +161,198 @@ const FinalScreen = memo(({ selectedOption }) => {
           }}
         />
         
-        {/* Pulsing heart */}
+        {/* Ornate corner flourishes */}
+        {[
+          { corner: 'top-4 left-4', rotate: 0 },
+          { corner: 'top-4 right-4', rotate: 90 },
+          { corner: 'bottom-4 left-4', rotate: -90 },
+          { corner: 'bottom-4 right-4', rotate: 180 },
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.25, scale: 1 }}
+            transition={{ delay: 0.8 + i * 0.1, type: 'spring' }}
+            className={`absolute ${item.corner} text-4xl text-romantic-400 pointer-events-none`}
+            style={{ rotate: `${item.rotate}deg` }}
+          >
+            ❦
+          </motion.div>
+        ))}
+        
+        {/* Decorative divider lines */}
         <motion.div
-          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl mb-4 sm:mb-6 drop-shadow-2xl relative z-10"
-          animate={{
-            scale: [1, 1.15, 1],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: [0.22, 1, 0.36, 1],
-          }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 1, duration: 0.6 }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent"
+        />
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 1, duration: 0.6 }}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent"
+        />
+        
+        {/* Floating hearts decoration inside card */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-3xl opacity-15 pointer-events-none"
+            style={{
+              left: `${15 + (i % 3) * 35}%`,
+              top: `${20 + Math.floor(i / 3) * 60}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              rotate: [0, 15, -15, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: i * 0.5,
+              ease: "easeInOut"
+            }}
+          >
+            💕
+          </motion.div>
+        ))}
+        
+        {/* Pulsing heart - Enhanced with ornamental frame */}
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 150 }}
+          className="relative inline-block mb-4 sm:mb-6"
         >
-          💝
+          {/* Ornamental circle around heart */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.3, scale: 1 }}
+            transition={{ delay: 0.8, type: 'spring' }}
+          >
+            <svg width="180" height="180" className="absolute">
+              <circle
+                cx="90"
+                cy="90"
+                r="70"
+                fill="none"
+                stroke="url(#heartGradient)"
+                strokeWidth="2"
+                strokeDasharray="4 4"
+              />
+              <defs>
+                <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FF4D6D" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#B83260" stopOpacity="0.5" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </motion.div>
+          
+          <motion.div
+            className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl relative z-10"
+            style={{
+              filter: 'drop-shadow(0 0 20px rgba(255, 77, 109, 0.5))',
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 10, -10, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            💝
+          </motion.div>
         </motion.div>
 
-        {/* Main message with typewriter effect */}
-        <motion.h1
-          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-romantic text-deep-rose mb-4 sm:mb-6 text-shadow-romantic leading-tight tracking-tight px-2 relative z-10 min-h-[80px] sm:min-h-[100px]"
+        {/* Main message with typewriter effect - Enhanced with ornate typography */}
+        <motion.div
+          className="relative mb-4 sm:mb-6 px-4"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
         >
-          {displayedText}
+          {/* Decorative quotation marks */}
           <motion.span
-            animate={{ opacity: [1, 0, 1] }}
-            transition={{ duration: 0.8, repeat: Infinity }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.3, scale: 1 }}
+            transition={{ delay: 1.5, type: 'spring' }}
+            className="absolute -left-4 sm:-left-8 top-0 text-5xl sm:text-6xl font-elegant text-romantic-400 leading-none hidden sm:block"
           >
-            |
+            "
           </motion.span>
-        </motion.h1>
+          
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-romantic font-bold text-deep-rose text-shadow-glow leading-tight tracking-tight relative z-10 min-h-[80px] sm:min-h-[100px] flex items-center justify-center italic">
+            {displayedText}
+            <motion.span
+              animate={{ opacity: [1, 0, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity }}
+              className="text-valentine-red ml-1"
+            >
+              |
+            </motion.span>
+          </h1>
+          
+          <motion.span
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.3, scale: 1 }}
+            transition={{ delay: 1.5, type: 'spring' }}
+            className="absolute -right-4 sm:-right-8 bottom-0 text-5xl sm:text-6xl font-elegant text-romantic-400 leading-none hidden sm:block"
+          >
+            "
+          </motion.span>
+        </motion.div>
 
-        {/* Selected option message */}
-        <motion.p
-          className="text-lg sm:text-xl md:text-2xl font-body text-deep-rose mb-6 sm:mb-8 px-2 font-semibold relative z-10 leading-relaxed"
+        {/* Selected option message - Enhanced with elegant divider */}
+        <motion.div
+          className="relative mb-6 sm:mb-8 px-4"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 3, type: "spring", stiffness: 100 }}
         >
-          {optionMessages[selectedOption] || '💖 An amazing day together'}
-        </motion.p>
+          {/* Decorative divider above */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 3.2, duration: 0.5 }}
+            className="flex items-center justify-center mb-4 gap-3"
+          >
+            <span className="text-sm text-romantic-400">❦</span>
+            <div className="flex-1 max-w-[100px] h-[1px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent" />
+            <span className="text-xs text-romantic-400">✦</span>
+            <div className="flex-1 max-w-[100px] h-[1px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent" />
+            <span className="text-sm text-romantic-400">❦</span>
+          </motion.div>
+          
+          <p
+            className="text-lg sm:text-xl md:text-2xl font-body text-deep-rose font-semibold relative z-10 leading-relaxed tracking-wide"
+            style={{
+              textShadow: '0 2px 8px rgba(184, 50, 96, 0.2)',
+            }}
+          >
+            {optionMessages[selectedOption] || '💖 An amazing day together'}
+          </p>
+          
+          {/* Decorative divider below */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 3.4, duration: 0.5 }}
+            className="flex items-center justify-center mt-4 gap-3"
+          >
+            <span className="text-sm text-romantic-400">❦</span>
+            <div className="flex-1 max-w-[100px] h-[1px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent" />
+            <span className="text-xs text-romantic-400">✦</span>
+            <div className="flex-1 max-w-[100px] h-[1px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent" />
+            <span className="text-sm text-romantic-400">❦</span>
+          </motion.div>
+        </motion.div>
 
         {/* Decorative divider */}
         <motion.div

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,7 +7,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -18,10 +18,14 @@ body {
   text-rendering: optimizeLegibility;
   transform: translateZ(0);
   backface-visibility: hidden;
-  /* Custom cursor */
+  /* Custom romantic cursor */
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23B83260"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') 12 12, auto;
-  /* Subtle background texture */
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence baseFrequency="0.9" numOctaves="3" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.03" /></svg>');
+  /* Rich textured background - layered noise and grain */
+  background-color: #FFF6EC;
+  background-image: 
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" seed="5" /><feColorMatrix type="saturate" values="0.3" /></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.025" /></svg>'),
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px);
+  background-blend-mode: overlay, normal;
 }
 
 html {
@@ -48,6 +52,7 @@ html, body, #root {
 }
 
 @layer utilities {
+  /* Enhanced Glass Morphism */
   .glass-morphism {
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(20px) saturate(180%);
@@ -56,19 +61,72 @@ html, body, #root {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15),
                 0 4px 20px rgba(184, 50, 96, 0.1),
                 inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    /* Hardware acceleration for glass effect */
     transform: translate3d(0, 0, 0);
   }
   
+  .glass-romantic {
+    background: linear-gradient(135deg, rgba(255, 192, 203, 0.2), rgba(230, 230, 250, 0.2));
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+      0 8px 32px rgba(255, 77, 109, 0.15),
+      0 4px 16px rgba(184, 50, 96, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -1px 0 rgba(255, 192, 203, 0.3);
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(30px) saturate(150%);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.1),
+      0 10px 30px rgba(255, 77, 109, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 
+      0 30px 80px rgba(0, 0, 0, 0.15),
+      0 15px 40px rgba(255, 77, 109, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Enhanced Text Shadows */
   .text-shadow-romantic {
-    text-shadow: 2px 2px 12px rgba(184, 50, 96, 0.3),
-                 0 0 20px rgba(248, 200, 220, 0.2),
-                 1px 1px 2px rgba(0, 0, 0, 0.08);
+    text-shadow: 
+      2px 2px 12px rgba(184, 50, 96, 0.4),
+      0 0 30px rgba(248, 200, 220, 0.3),
+      1px 1px 3px rgba(0, 0, 0, 0.1),
+      0 4px 8px rgba(255, 77, 109, 0.2);
   }
   
   .text-shadow-soft {
-    text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.08),
-                 0 0 15px rgba(255, 255, 255, 0.4);
+    text-shadow: 
+      1px 1px 8px rgba(0, 0, 0, 0.08),
+      0 0 20px rgba(255, 255, 255, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .text-shadow-glow {
+    text-shadow: 
+      0 0 10px rgba(255, 77, 109, 0.6),
+      0 0 20px rgba(255, 77, 109, 0.4),
+      0 0 30px rgba(255, 77, 109, 0.3),
+      2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .text-shadow-deep {
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      0 4px 8px rgba(0, 0, 0, 0.08),
+      0 8px 16px rgba(184, 50, 96, 0.15);
   }
   
   .touch-manipulation {
@@ -78,9 +136,28 @@ html, body, #root {
     -webkit-user-select: none;
   }
   
+  /* Enhanced Gradient Borders */
   .gradient-border {
     border: 2px solid;
     border-image: linear-gradient(135deg, #FF4D6D, #FFC0CB, #E6E6FA) 1;
+  }
+  
+  .gradient-border-romantic {
+    position: relative;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  
+  .gradient-border-romantic::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, #FF4D6D, #FFC0CB, #E6E6FA, #FF4D6D);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
   }
   
   .shimmer {
@@ -92,6 +169,155 @@ html, body, #root {
     );
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
+  }
+  
+  /* Modern Button Styles */
+  .btn-romantic {
+    @apply px-8 py-4 rounded-2xl font-semibold text-white;
+    @apply bg-gradient-to-r from-valentine-red to-deep-rose;
+    @apply shadow-lg hover:shadow-2xl;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:scale-105 active:scale-95;
+    @apply relative overflow-hidden;
+  }
+  
+  .btn-romantic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-romantic:hover::before {
+    left: 100%;
+  }
+  
+  /* Ornate Decorative Borders */
+  .ornate-border {
+    position: relative;
+    padding: 2rem;
+  }
+  
+  .ornate-border::before,
+  .ornate-border::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 3px solid;
+    border-image: linear-gradient(135deg, #FF4D6D, #B83260) 1;
+  }
+  
+  .ornate-border::before {
+    top: 0;
+    left: 0;
+    border-right: none;
+    border-bottom: none;
+  }
+  
+  .ornate-border::after {
+    bottom: 0;
+    right: 0;
+    border-left: none;
+    border-top: none;
+  }
+  
+  /* Lace Pattern Background */
+  .lace-pattern {
+    background-image: 
+      radial-gradient(circle at 20% 50%, transparent 20%, rgba(255, 77, 109, 0.05) 21%, transparent 21%),
+      radial-gradient(circle at 80% 50%, transparent 20%, rgba(255, 77, 109, 0.05) 21%, transparent 21%),
+      radial-gradient(circle at 50% 0%, transparent 20%, rgba(255, 192, 203, 0.08) 21%, transparent 21%),
+      radial-gradient(circle at 50% 100%, transparent 20%, rgba(255, 192, 203, 0.08) 21%, transparent 21%);
+    background-size: 100px 100px;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  
+  /* Vintage Paper Texture */
+  .paper-texture {
+    position: relative;
+  }
+  
+  .paper-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"300\"><filter id=\"paper\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"4\" result=\"noise\" /><feDiffuseLighting in=\"noise\" lighting-color=\"%23FFF6EC\" surfaceScale=\"2\"><feDistantLight azimuth=\"45\" elevation=\"60\" /></feDiffuseLighting></filter><rect width=\"300\" height=\"300\" filter=\"url(%23paper)\" opacity=\"0.3\" /></svg>');
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  
+  /* Romantic Vignette Effect */
+  .romantic-vignette {
+    position: relative;
+  }
+  
+  .romantic-vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(184, 50, 96, 0.15) 100%);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+  
+  /* Floral Decoration */
+  .floral-accent {
+    position: relative;
+  }
+  
+  .floral-accent::before {
+    content: '❦';
+    position: absolute;
+    font-size: 3rem;
+    color: rgba(255, 77, 109, 0.15);
+    transform: rotate(-15deg);
+  }
+  
+  /* Elegant Divider */
+  .elegant-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .elegant-divider::before,
+  .elegant-divider::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FF4D6D 50%, transparent);
+  }
+  
+  /* Stained Glass Effect */
+  .stained-glass {
+    background: 
+      linear-gradient(135deg, rgba(255, 77, 109, 0.1) 25%, transparent 25%),
+      linear-gradient(225deg, rgba(255, 192, 203, 0.1) 25%, transparent 25%),
+      linear-gradient(45deg, rgba(230, 230, 250, 0.1) 25%, transparent 25%),
+      linear-gradient(315deg, rgba(248, 200, 220, 0.1) 25%, transparent 25%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 0, 30px -30px, 0 30px;
+  }
+  
+  /* Smooth Scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Focus Styles for Accessibility */
+  .focus-romantic:focus-visible {
+    outline: 3px solid rgba(255, 77, 109, 0.5);
+    outline-offset: 3px;
+    border-radius: 8px;
   }
   
   @keyframes shimmer {

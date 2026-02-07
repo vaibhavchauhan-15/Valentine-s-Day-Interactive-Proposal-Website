@@ -138,14 +138,21 @@ const ValentineQuestion = memo(({ onYes }) => {
         </>
       )}
 
-      {/* Main Content */}
+      {/* Main Content - Enhanced with ornate romantic styling */}
       <motion.div
-        className="glass-morphism rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl max-w-2xl w-full mx-4 relative overflow-hidden"
+        className="glass-romantic rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 md:p-12 shadow-2xl max-w-2xl w-full mx-4 relative overflow-hidden border-2 border-white/50 paper-texture"
         variants={itemVariants}
       >
-        {/* Shimmer effect */}
+        {/* Lace pattern overlay */}
+        <div className="absolute inset-0 lace-pattern opacity-30 pointer-events-none" />
+        
+        {/* Enhanced shimmer effect */}
         <motion.div
-          className="absolute inset-0 shimmer opacity-30"
+          className="absolute inset-0 opacity-20"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)',
+            backgroundSize: '200% 100%',
+          }}
           animate={{
             backgroundPosition: ['-200% 0', '200% 0'],
           }}
@@ -155,51 +162,134 @@ const ValentineQuestion = memo(({ onYes }) => {
             ease: "linear",
           }}
         />
-        {/* Title */}
-        <motion.h1
+        
+        {/* Ornate corner flourishes */}
+        {[
+          { corner: 'top-3 left-3', rotate: 0 },
+          { corner: 'top-3 right-3', rotate: 90 },
+          { corner: 'bottom-3 left-3', rotate: -90 },
+          { corner: 'bottom-3 right-3', rotate: 180 },
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.25, scale: 1 }}
+            transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
+            className={`absolute ${item.corner} text-3xl text-romantic-400 pointer-events-none`}
+            style={{ rotate: `${item.rotate}deg` }}
+          >
+            ❦
+          </motion.div>
+        ))}
+        
+        {/* Decorative divider lines */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent"
+        />
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent"
+        />
+        {/* Title - Enhanced with ornate typography */}
+        <motion.div
           variants={itemVariants}
-          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-romantic text-center text-deep-rose mb-6 sm:mb-8 text-shadow-romantic leading-tight tracking-tight"
+          className="relative z-10 mb-6 sm:mb-8"
         >
-          Will you be my Valentine? 💝
-        </motion.h1>
+          {/* Decorative quotation marks */}
+          <motion.span
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.3, scale: 1 }}
+            transition={{ delay: 0.8, type: 'spring' }}
+            className="absolute -left-8 -top-4 text-6xl font-elegant text-romantic-400 leading-none hidden sm:block"
+          >
+            "
+          </motion.span>
+          
+          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-romantic font-bold text-center text-deep-rose text-shadow-glow leading-tight tracking-tight italic">
+            Will you be my Valentine?
+          </h1>
+          
+          {/* Ornamental heart */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 1, type: 'spring', stiffness: 200 }}
+            className="flex justify-center mt-2"
+          >
+            <span className="text-4xl filter drop-shadow-lg">💝</span>
+          </motion.div>
+          
+          <motion.span
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 0.3, scale: 1 }}
+            transition={{ delay: 0.8, type: 'spring' }}
+            className="absolute -right-8 -bottom-4 text-6xl font-elegant text-romantic-400 leading-none hidden sm:block"
+          >
+            "
+          </motion.span>
+        </motion.div>
 
         {/* Buttons */}
         <motion.div 
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center relative min-h-[120px] sm:min-h-[140px] w-full px-2"
         >
-          {/* Yes Button */}
+          {/* Yes Button - Enhanced with better effects */}
           <motion.button
             onClick={handleYesClick}
             whileHover={{ 
-              scale: 1.08, 
-              y: -5,
-              boxShadow: "0 15px 40px rgba(184, 50, 96, 0.4)",
-              transition: { duration: 0.2, type: 'spring', stiffness: 300 } 
+              scale: 1.1, 
+              y: -8,
+              boxShadow: "0 20px 50px rgba(184, 50, 96, 0.5), 0 0 30px rgba(255, 77, 109, 0.4)",
+              transition: { duration: 0.2, type: 'spring', stiffness: 400 } 
             }}
             whileTap={{ 
               scale: 0.95,
               transition: { duration: 0.1 }
             }}
-            className="relative bg-gradient-to-r from-deep-rose via-valentine-red to-elegant-maroon text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl transition-all duration-300 z-10 touch-manipulation min-w-[140px] overflow-hidden group"
+            className="relative bg-gradient-to-r from-deep-rose via-valentine-red to-coral-pink text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl transition-all duration-300 z-10 touch-manipulation min-w-[140px] overflow-hidden group border-2 border-white/30"
           >
+            {/* Animated gradient overlay */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
+              className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/50 to-white/30"
               animate={{
                 x: ['-100%', '100%'],
               }}
               transition={{
-                duration: 2,
+                duration: 2.5,
                 repeat: Infinity,
                 ease: "linear",
               }}
             />
-            <span className="relative z-10 flex items-center justify-center gap-2">
+            
+            {/* Glow effect */}
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              animate={{
+                boxShadow: [
+                  '0 0 20px rgba(255, 77, 109, 0.3) inset',
+                  '0 0 30px rgba(255, 77, 109, 0.6) inset',
+                  '0 0 20px rgba(255, 77, 109, 0.3) inset',
+                ],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            
+            <span className="relative z-10 flex items-center justify-center gap-2 drop-shadow-lg">
               Yes! ❤️
             </span>
           </motion.button>
 
-          {/* No Button - Moves away with rotation and tooltip */}
+          {/* No Button - Enhanced with better styling */}
           <div className="relative">
             <motion.button
               ref={noButtonRef}
@@ -212,7 +302,7 @@ const ValentineQuestion = memo(({ onYes }) => {
               animate={{
                 x: noPosition.x,
                 y: noPosition.y,
-                rotate: noPosition.x * 0.1, // Subtle rotation based on x movement
+                rotate: noPosition.x * 0.15,
               }}
               transition={{ 
                 type: 'spring', 
@@ -222,25 +312,40 @@ const ValentineQuestion = memo(({ onYes }) => {
               }}
               style={{ position: 'relative' }}
               whileHover={{ 
-                scale: 1.02,
+                scale: 1.05,
+                boxShadow: "0 10px 30px rgba(156, 163, 175, 0.4)",
                 transition: { duration: 0.2 }
               }}
-              className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-lg cursor-pointer hover:from-gray-500 hover:to-gray-600 transition-all touch-manipulation min-w-[140px]"
+              className="bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-lg cursor-pointer transition-all touch-manipulation min-w-[140px] border-2 border-white/20 relative overflow-hidden"
             >
-              No 😢
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{
+                  x: ['-100%', '100%'],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+              <span className="relative z-10">No 😢</span>
             </motion.button>
             
-            {/* Tooltip */}
+            {/* Enhanced Tooltip */}
             <AnimatePresence>
               {showTooltip && noAttempts > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-deep-rose text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap shadow-lg"
+                  className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-deep-rose to-valentine-red text-white px-5 py-3 rounded-xl text-sm font-semibold whitespace-nowrap shadow-2xl border-2 border-white/30"
+                  style={{
+                    filter: 'drop-shadow(0 4px 12px rgba(184, 50, 96, 0.4))',
+                  }}
                 >
-                  {cuteMessages[Math.min(noAttempts - 1, cuteMessages.length - 1)]}
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-deep-rose" />
+                  <span className="relative z-10">{cuteMessages[Math.min(noAttempts - 1, cuteMessages.length - 1)]}</span>
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-3 h-3 bg-valentine-red border-r-2 border-b-2 border-white/30" />
                 </motion.div>
               )}
             </AnimatePresence>
