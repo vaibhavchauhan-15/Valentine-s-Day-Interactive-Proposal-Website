@@ -335,7 +335,7 @@ html, body, #root {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Optimize for animations */
+/* Optimize for animations - Enhanced performance */
 .motion-div,
 [class*="motion"] {
   will-change: transform;
@@ -344,7 +344,7 @@ html, body, #root {
   perspective: 1000px;
 }
 
-/* Smooth heart animations with GPU acceleration */
+/* Smooth heart animations with GPU acceleration - Optimized */
 .will-change-transform {
   will-change: transform, opacity;
   transform: translateZ(0);
@@ -357,11 +357,37 @@ html, body, #root {
   -webkit-transform: translate3d(0, 0, 0);
 }
 
+/* Performance-optimized button transitions */
+button, .btn-romantic {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Prevent text size adjustments on mobile */
 @media screen and (max-width: 640px) {
   body {
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
+  }
+  
+  /* Optimize touch interactions */
+  button, a, [role="button"] {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

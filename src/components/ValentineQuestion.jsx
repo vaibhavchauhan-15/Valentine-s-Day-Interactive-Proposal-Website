@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useRef, memo } from 'react'
+import { useState, useRef, memo, useMemo, useCallback } from 'react'
+import { VARIANTS, EASING, DURATION, WILL_CHANGE, BUTTON_ANIMATIONS } from '../constants/animations'
 
 const ValentineQuestion = memo(({ onYes }) => {
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 })
@@ -9,7 +10,7 @@ const ValentineQuestion = memo(({ onYes }) => {
   const noButtonRef = useRef(null)
 
   const cuteMessages = [
-    "Are you sure? 🥺",
+    "Aresure? 🥺",
     "Think again! 💭",
     "Don't break my heart... 💔",
     "Please? 🙏",
@@ -19,32 +20,28 @@ const ValentineQuestion = memo(({ onYes }) => {
     "I promise it'll be fun! 🎉",
   ]
 
-  const containerVariants = {
+  const containerVariants = useMemo(() => ({
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1
+        staggerChildren: 0.12,
+        delayChildren: 0.08
       }
     },
     exit: { opacity: 0, scale: 0.9 }
-  }
+  }), [])
 
-  const itemVariants = {
+  const itemVariants = useMemo(() => ({
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        damping: 15
-      }
+      transition: EASING.softSpring
     }
-  }
+  }), [])
 
-  const handleNoHover = (e) => {
+  const handleNoHover = useCallback((e) => {
     // Intelligent cursor-aware movement
     const button = noButtonRef.current
     if (!button) return
@@ -60,30 +57,30 @@ const ValentineQuestion = memo(({ onYes }) => {
     )
     
     // Increase distance with each attempt
-    const baseRange = 180
-    const multiplier = 1 + (noAttempts * 0.4)
+    const baseRange = 170
+    const multiplier = 1 + (noAttempts * 0.35)
     const distance = baseRange * multiplier
     
-    const randomX = Math.cos(angle) * distance + (Math.random() - 0.5) * 40
-    const randomY = Math.sin(angle) * distance + (Math.random() - 0.5) * 40
+    const randomX = Math.cos(angle) * distance + (Math.random() - 0.5) * 35
+    const randomY = Math.sin(angle) * distance + (Math.random() - 0.5) * 35
     
     setNoPosition({ x: randomX, y: randomY })
     setNoAttempts(prev => prev + 1)
     setShowTooltip(true)
-    setTimeout(() => setShowTooltip(false), 2000)
-  }
+    setTimeout(() => setShowTooltip(false), 1800)
+  }, [noAttempts])
 
   const handleNoClick = (e) => {
     e.preventDefault()
     handleNoHover()
   }
 
-  const handleYesClick = () => {
+  const handleYesClick = useCallback(() => {
     setShowHeartDoor(true)
     setTimeout(() => {
       onYes()
-    }, 2000)
-  }
+    }, 1900)
+  }, [onYes])
 
   return (
     <motion.div
@@ -91,46 +88,46 @@ const ValentineQuestion = memo(({ onYes }) => {
       initial="hidden"
       animate="visible"
       exit="exit"
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: DURATION.normal, ease: EASING.smooth }}
       className="fixed inset-0 flex flex-col items-center justify-center z-10 px-4"
     >
-      {/* Heart Door Animation */}
+      {/* Heart Door Animation - Optimized */}
       {showHeartDoor && (
         <>
           <motion.div
             className="fixed inset-0 bg-gradient-to-br from-valentine-red via-pink-500 to-valentine-pink z-50"
             initial={{ clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)' }}
             animate={{ clipPath: 'polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%)' }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            style={{ willChange: 'clip-path' }}
+            transition={{ duration: 0.75, ease: EASING.smooth }}
+            style={WILL_CHANGE.auto}
           />
           <motion.div
             className="fixed inset-0 bg-gradient-to-bl from-valentine-red via-pink-500 to-valentine-pink z-50"
             initial={{ clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)' }}
             animate={{ clipPath: 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)' }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            style={{ willChange: 'clip-path' }}
+            transition={{ duration: 0.75, ease: EASING.smooth }}
+            style={WILL_CHANGE.auto}
           />
           
-          {/* Heart shape overlay */}
+          {/* Heart shape overlay - Optimized */}
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.5, delay: 0.4, type: "spring", stiffness: 200 }}
-            style={{ willChange: 'transform' }}
+            transition={{ duration: 0.5, delay: 0.35, ...EASING.bouncySpring }}
+            style={WILL_CHANGE.transform}
           >
             <motion.div 
               className="text-9xl drop-shadow-2xl"
               animate={{
-                scale: [1, 1.15, 1],
+                scale: [1, 1.12, 1],
               }}
               transition={{
-                duration: 1,
+                duration: 0.9,
                 repeat: Infinity,
-                ease: [0.22, 1, 0.36, 1],
+                ease: EASING.smooth,
               }}
-              style={{ willChange: 'transform' }}
+              style={WILL_CHANGE.transform}
             >
               ❤️
             </motion.div>
@@ -243,16 +240,12 @@ const ValentineQuestion = memo(({ onYes }) => {
           <motion.button
             onClick={handleYesClick}
             whileHover={{ 
-              scale: 1.1, 
-              y: -8,
+              ...BUTTON_ANIMATIONS.hover,
               boxShadow: "0 20px 50px rgba(184, 50, 96, 0.5), 0 0 30px rgba(255, 77, 109, 0.4)",
-              transition: { duration: 0.2, type: 'spring', stiffness: 400 } 
             }}
-            whileTap={{ 
-              scale: 0.95,
-              transition: { duration: 0.1 }
-            }}
+            whileTap={BUTTON_ANIMATIONS.tap}
             className="relative bg-gradient-to-r from-deep-rose via-valentine-red to-coral-pink text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl transition-all duration-300 z-10 touch-manipulation min-w-[140px] overflow-hidden group border-2 border-white/30"
+            style={WILL_CHANGE.transform}
           >
             {/* Animated gradient overlay */}
             <motion.div

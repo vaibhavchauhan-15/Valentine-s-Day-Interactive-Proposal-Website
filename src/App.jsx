@@ -1,16 +1,17 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, memo, useCallback } from 'react'
 import { motion, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
+import { useThrottledMouseMove } from './hooks/useOptimizedAnimation'
+import { SCREEN_TRANSITIONS, DURATION, EASING, WILL_CHANGE } from './constants/animations'
 import PreloaderScreen from './components/PreloaderScreen'
 import GiftBoxScreen from './components/GiftBoxScreen'
 import ValentineQuestion from './components/ValentineQuestion'
 import DateOptionsScreen from './components/DateOptionsScreen'
-import PlatterTransitionScreen from './components/PlatterTransitionScreen'
 import FinalScreen from './components/FinalScreen'
 import FloatingHearts from './components/FloatingHearts'
 
 function App() {
   const [loading, setLoading] = useState(true)
-  const [screen, setScreen] = useState('gift') // gift, question, options, platterTransition, final
+  const [screen, setScreen] = useState('gift') // gift, question, options, final
   const [selectedOption, setSelectedOption] = useState('')
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
@@ -18,21 +19,25 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 1800)
+    }, 1700)
     
     return () => clearTimeout(timer)
   }, [])
+
+  // Throttled mouse move handler for better performance
+  const handleMouseMove = useCallback((e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 15
+    const y = (e.clientY / window.innerHeight - 0.5) * 15
+    setMousePosition({ x, y })
+  }, [])
+
+  const throttledMouseMove = useThrottledMouseMove(handleMouseMove, 50)
+  
   // Track mouse position for parallax effect
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20
-      const y = (e.clientY / window.innerHeight - 0.5) * 20
-      setMousePosition({ x, y })
-    }
-    
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+    window.addEventListener('mousemove', throttledMouseMove)
+    return () => window.removeEventListener('mousemove', throttledMouseMove)
+  }, [throttledMouseMove])
 
   const handleGiftOpen = () => {
     setScreen('question')
@@ -44,17 +49,9 @@ function App() {
 
   const handleDateSelection = (option) => {
     setSelectedOption(option)
-    if (option === 'dinner') {
-      setScreen('platterTransition')
-    } else {
-      setTimeout(() => {
-        setScreen('final')
-      }, 2500)
-    }
-  }
-
-  const handlePlatterComplete = () => {
-    setScreen('final')
+    setTimeout(() => {
+      setScreen('final')
+    }, 2300)
   }
 
   return (
@@ -68,17 +65,18 @@ function App() {
         {/* Main content - only show after loading */}
         {!loading && (
           <>
-            {/* Animated mesh gradient background with parallax */}
+            {/* Animated mesh gradient background with parallax - Optimized */}
             <motion.div 
               className="absolute inset-0 bg-gradient-to-br from-deep-rose/20 via-blush/30 to-elegant-maroon/20"
               style={{
                 x: mousePosition.x,
                 y: mousePosition.y,
+                ...WILL_CHANGE.transform,
               }}
-              transition={{ type: 'spring', stiffness: 50, damping: 30 }}
+              transition={{ type: 'spring', stiffness: 45, damping: 25 }}
             />
             
-            {/* Slow animated gradient overlay */}
+            {/* Slow animated gradient overlay - Optimized */}
             <motion.div 
               className="absolute inset-0 bg-gradient-to-tr from-valentine-pink/20 via-transparent to-soft-gold/10"
               animate={{
@@ -86,24 +84,26 @@ function App() {
                 opacity: [0.3, 0.5, 0.3],
               }}
               transition={{
-                duration: 15,
+                duration: 14,
                 repeat: Infinity,
                 ease: 'linear'
               }}
               style={{ 
                 backgroundSize: '200% 200%',
+                ...WILL_CHANGE.opacity,
               }}
             />
             
-            {/* Blurred depth layer */}
+            {/* Blurred depth layer - Optimized */}
             <motion.div 
               className="absolute inset-0 bg-gradient-to-bl from-elegant-maroon/10 via-transparent to-deep-rose/10"
               style={{
-                x: mousePosition.x * -0.5,
-                y: mousePosition.y * -0.5,
-                filter: 'blur(60px)',
+                x: mousePosition.x * -0.4,
+                y: mousePosition.y * -0.4,
+                filter: 'blur(55px)',
+                ...WILL_CHANGE.transform,
               }}
-              transition={{ type: 'spring', stiffness: 30, damping: 30 }}
+              transition={{ type: 'spring', stiffness: 25, damping: 25 }}
             />
       
             <FloatingHearts />
@@ -112,10 +112,7 @@ function App() {
               {screen === 'gift' && (
                 <motion.div
                   key="gift"
-                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  {...SCREEN_TRANSITIONS.fadeScale}
                 >
                   <GiftBoxScreen onOpen={handleGiftOpen} />
                 </motion.div>
@@ -124,10 +121,7 @@ function App() {
               {screen === 'question' && (
                 <motion.div
                   key="question"
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  {...SCREEN_TRANSITIONS.slideLeft}
                 >
                   <ValentineQuestion onYes={handleYes} />
                 </motion.div>
@@ -136,34 +130,19 @@ function App() {
               {screen === 'options' && (
                 <motion.div
                   key="options"
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  {...SCREEN_TRANSITIONS.slideUp}
                 >
                   <DateOptionsScreen onSelect={handleDateSelection} />
-                </motion.div>
-              )}
-              
-              {screen === 'platterTransition' && (
-                <motion.div
-                  key="platter"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <PlatterTransitionScreen onComplete={handlePlatterComplete} />
                 </motion.div>
               )}
               
               {screen === 'final' && (
                 <motion.div
                   key="final"
-                  initial={{ opacity: 0, scale: 1.1 }}
+                  initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: DURATION.slow, ease: EASING.smooth }}
                 >
                   <FinalScreen selectedOption={selectedOption} />
                 </motion.div>

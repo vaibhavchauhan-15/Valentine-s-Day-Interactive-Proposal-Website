@@ -1,15 +1,17 @@
 import { motion } from 'framer-motion'
 import { useEffect, memo, useMemo } from 'react'
+import { EASING, DURATION, WILL_CHANGE } from '../constants/animations'
 
 const PlatterTransitionScreen = memo(({ onComplete }) => {
   // Memoize random positions to prevent recalculation on each render
+  // Reduced from 15 to 12 for better performance
   const floatingHearts = useMemo(() => 
-    Array.from({ length: 15 }, (_, i) => ({
+    Array.from({ length: 12 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       top: Math.random() * 100,
-      delay: Math.random() * 1.5,
-      duration: 3 + Math.random() * 2,
+      delay: Math.random() * 1.4,
+      duration: 2.8 + Math.random() * 1.8,
       emoji: ['❤️', '💕', '💖', '💗'][i % 4]
     })), []
   )
@@ -18,14 +20,14 @@ const PlatterTransitionScreen = memo(({ onComplete }) => {
     Array.from({ length: 8 }, (_, i) => ({
       id: i,
       angle: (i * Math.PI * 2) / 8,
-      delay: 1.8 + i * 0.08
+      delay: 1.7 + i * 0.075
     })), []
   )
 
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete()
-    }, 3500)
+    }, 3300)
     
     return () => clearTimeout(timer)
   }, [onComplete])
@@ -35,7 +37,7 @@ const PlatterTransitionScreen = memo(({ onComplete }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
+      transition={{ duration: DURATION.normal, ease: "easeInOut" }}
       className="fixed inset-0 flex items-center justify-center z-50 bg-gradient-to-br from-peach-glow via-lavender-mist to-blush overflow-hidden romantic-vignette"
     >
       {/* Ornate lace pattern overlay */}
@@ -75,39 +77,40 @@ const PlatterTransitionScreen = memo(({ onComplete }) => {
         }}
       />
       
-      {/* Decorative corner flourishes */}
+      {/* Decorative corner flourishes - Optimized */}
       {[
-        { position: 'top-8 left-8', rotate: 0, delay: 0.5 },
-        { position: 'top-8 right-8', rotate: 90, delay: 0.7 },
-        { position: 'bottom-8 left-8', rotate: -90, delay: 0.9 },
-        { position: 'bottom-8 right-8', rotate: 180, delay: 1.1 },
+        { position: 'top-8 left-8', rotate: 0, delay: 0.4 },
+        { position: 'top-8 right-8', rotate: 90, delay: 0.6 },
+        { position: 'bottom-8 left-8', rotate: -90, delay: 0.8 },
+        { position: 'bottom-8 right-8', rotate: 180, delay: 1.0 },
       ].map((corner, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 0.3, scale: 1 }}
-          transition={{ delay: corner.delay, duration: 0.8, type: 'spring' }}
+          transition={{ delay: corner.delay, duration: 0.7, ...EASING.softSpring }}
           className={`absolute ${corner.position} text-6xl text-romantic-400`}
-          style={{ rotate: `${corner.rotate}deg`, filter: 'drop-shadow(0 2px 8px rgba(255, 77, 109, 0.3))' }}
+          style={{ rotate: `${corner.rotate}deg`, filter: 'drop-shadow(0 2px 8px rgba(255, 77, 109, 0.3))', ...WILL_CHANGE.transform }}
         >
           ❦
         </motion.div>
       ))}
       
-      {/* Floating hearts background - Enhanced with better effects */}
+      {/* Floating hearts background - Optimized with better effects */}
       {floatingHearts.map((heart) => (
         <motion.div
           key={heart.id}
-          className="absolute text-2xl md:text-3xl will-change-transform filter drop-shadow-lg"
+          className="absolute text-2xl md:text-3xl filter drop-shadow-lg"
           style={{
             left: `${heart.left}%`,
             top: `${heart.top}%`,
+            ...WILL_CHANGE.transformOpacity,
           }}
           initial={{ opacity: 0, y: 0, scale: 0.5 }}
           animate={{
-            y: [-30, 0, -30],
-            opacity: [0, 0.8, 0.6, 0.8, 0],
-            scale: [0.8, 1.2, 0.9, 1.2, 0.8],
+            y: [-25, 0, -25],
+            opacity: [0, 0.75, 0.6, 0.75, 0],
+            scale: [0.8, 1.15, 0.9, 1.15, 0.8],
             rotate: [0, 10, -10, 10, 0],
           }}
           transition={{

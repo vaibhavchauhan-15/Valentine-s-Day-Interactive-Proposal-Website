@@ -21,7 +21,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
   const options = [
     {
       id: 'movie',
-      title: '🎬 Romantic Movie Date',
+      title: 'Romantic Movie Date',
+      icon: '/icons/movie-icon.png',
       description: 'Cozy up with popcorn and your favorite films',
       gradient: 'from-purple-500 to-pink-500',
       message: "Let's find the perfect movie together! 🍿",
@@ -29,7 +30,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
     },
     {
       id: 'dinner',
-      title: '🍽️ Romantic Dinner Date',
+      title: 'Romantic Dinner Date',
+      icon: '/icons/dinner-icon.png',
       description: 'Candlelit dining with exquisite cuisine',
       gradient: 'from-deep-rose to-elegant-maroon',
       message: 'Table booked for two! 🕯️',
@@ -37,7 +39,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
     },
     {
       id: 'drive',
-      title: '🚗 Romantic Long Drive',
+      title: 'Romantic Long Drive',
+      icon: '/icons/drive-icon.png',
       description: 'Scenic routes with endless conversations',
       gradient: 'from-blue-500 to-cyan-500',
       message: 'Road trip with you sounds perfect! 🛣️',
@@ -45,7 +48,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
     },
     {
       id: 'camping',
-      title: '⛺ Romantic Camping Date',
+      title: 'Romantic Camping Date',
+      icon: '/icons/camping-icon.png',
       description: 'Stargazing under the moonlight',
       gradient: 'from-green-500 to-teal-500',
       message: 'Under the stars, just us! ✨',
@@ -97,14 +101,6 @@ const DateOptionsScreen = memo(({ onSelect }) => {
     }
     
     setSelectedOption(option.id)
-    
-    // If dinner is selected, immediately transition to platter screen
-    if (option.id === 'dinner') {
-      onSelect(option.id)
-      return
-    }
-    
-    // For other options, show animation first
     setAnimationType(option.id)
     setShowAnimation(true)
     
@@ -124,7 +120,21 @@ const DateOptionsScreen = memo(({ onSelect }) => {
     >
       {/* Animations for different options */}
       <AnimatePresence>
-        {/* Dinner animation removed - using PlatterTransitionScreen instead */}
+        {showAnimation && animationType === 'dinner' && (
+          <motion.div 
+            className="fixed inset-0 z-40 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <img 
+              src="/animation/Dinner Animation.gif" 
+              alt="Romantic Dinner" 
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+        )}
 
         {showAnimation && animationType === 'drive' && (
           <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden">
@@ -254,7 +264,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
 
       {/* Main Content - Enhanced with ornate romantic styling */}
       <motion.div
-        className="glass-romantic rounded-[2rem] p-6 md:p-8 lg:p-10 shadow-2xl max-w-2xl w-full relative overflow-hidden border-2 border-white/50 paper-texture"
+        className="glass-romantic rounded-[2rem] p-8 md:p-12 lg:p-14 shadow-2xl max-w-3xl w-full relative overflow-hidden border-2 border-white/50 paper-texture"
         initial={{ scale: 0.8, y: 50, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         transition={{ 
@@ -311,7 +321,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
         />
         
         <motion.h1
-          className="text-2xl md:text-4xl lg:text-5xl font-romantic font-bold text-center text-deep-rose mb-6 md:mb-8 text-shadow-glow relative z-10 tracking-tight leading-tight italic px-4"
+          className="text-2xl md:text-3xl lg:text-4xl font-romantic font-bold text-center text-deep-rose mb-8 md:mb-10 text-shadow-glow relative z-10 tracking-tight leading-tight italic px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
@@ -321,7 +331,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.8, type: 'spring', stiffness: 150 }}
-            className="inline-block ml-2 text-4xl"
+            className="inline-block ml-2 text-3xl md:text-4xl"
           >
             💖
           </motion.span>
@@ -346,7 +356,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 relative min-h-[320px] overflow-visible">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 lg:gap-6 relative min-h-[280px] overflow-visible">
           {options.map((option, index) => (
             <motion.div
               key={option.id}
@@ -444,7 +454,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
                   }
                 }}
                 disabled={selectedOption !== null && option.isClickable}
-                className={`relative w-full glass-morphism p-6 md:p-8 rounded-2xl text-white shadow-lg overflow-hidden group ${
+                className={`relative w-full glass-morphism p-4 md:p-5 lg:p-6 rounded-2xl text-white shadow-lg overflow-hidden group ${
                   selectedOption !== null && option.isClickable ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                 } ${!option.isClickable ? 'cursor-pointer' : ''}`}
                 style={{
@@ -481,12 +491,16 @@ const DateOptionsScreen = memo(({ onSelect }) => {
                   />
                 )}
                 
-                <div className="flex flex-col items-center gap-3 relative z-10">
-                  <span className="text-4xl md:text-5xl drop-shadow-2xl">{option.title.split(' ')[0]}</span>
-                  <span className="text-xl md:text-2xl font-bold drop-shadow-lg text-center tracking-wide">
-                    {option.title.split(' ').slice(1).join(' ')}
+                <div className="flex flex-col items-center gap-2 md:gap-3 relative z-10">
+                  <img 
+                    src={option.icon} 
+                    alt={option.title}
+                    className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 drop-shadow-2xl object-contain"
+                  />
+                  <span className="text-base md:text-lg lg:text-xl font-bold drop-shadow-lg text-center tracking-wide leading-tight">
+                    {option.title}
                   </span>
-                  <p className="text-sm md:text-base opacity-90 text-center font-medium leading-relaxed px-2">
+                  <p className="text-xs md:text-sm opacity-90 text-center font-medium leading-relaxed px-1">
                     {option.description}
                   </p>
                   

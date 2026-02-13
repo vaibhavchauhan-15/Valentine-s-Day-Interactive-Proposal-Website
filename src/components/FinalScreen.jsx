@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect, memo, useRef } from 'react'
+import { useState, useEffect, memo, useRef, useMemo } from 'react'
+import { EASING, DURATION, WILL_CHANGE } from '../constants/animations'
 
 const FinalScreen = memo(({ selectedOption }) => {
   const [displayedText, setDisplayedText] = useState('')
@@ -7,7 +8,7 @@ const FinalScreen = memo(({ selectedOption }) => {
   const audioRef = useRef(null)
   const fullText = "Can't wait to spend Valentine's Day with you! ❤️"
 
-  // Typewriter effect
+  // Typewriter effect - Optimized
   useEffect(() => {
     let currentIndex = 0
     const interval = setInterval(() => {
@@ -17,7 +18,7 @@ const FinalScreen = memo(({ selectedOption }) => {
       } else {
         clearInterval(interval)
       }
-    }, 50)
+    }, 45)
     
     return () => clearInterval(interval)
   }, [])
@@ -51,15 +52,24 @@ const FinalScreen = memo(({ selectedOption }) => {
     camping: '⛺ Camping under the stars together',
   }
 
+  // Memoize confetti configuration for better performance
+  const confettiHearts = useMemo(() => 
+    Array.from({ length: 22 }, (_, i) => ({
+      delay: (i * 0.14) % 2.8,
+      duration: 4.5 + (i % 3) * 0.5,
+      xOffset: (i % 5) * 20,
+      emoji: ['❤️', '💕', '💖', '💗', '💝', '💘'][i % 6]
+    })), [])
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ 
         opacity: 1, 
-        scale: [0.95, 1, 1.02, 1],
+        scale: [0.95, 1, 1.01, 1],
       }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 2.5, ease: EASING.smooth }}
       className="fixed inset-0 flex flex-col items-center justify-center z-10 px-4"
     >
       {/* Audio element */}
@@ -74,59 +84,55 @@ const FinalScreen = memo(({ selectedOption }) => {
       <motion.button
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 2, type: 'spring', stiffness: 200 }}
+        transition={{ delay: 1.8, ...EASING.bouncySpring }}
         onClick={() => setMusicEnabled(!musicEnabled)}
         className="fixed top-8 right-8 z-50 bg-gradient-to-r from-deep-rose to-valentine-red backdrop-blur-md text-white p-4 rounded-full shadow-2xl border-2 border-white/30"
         whileHover={{ 
-          scale: 1.15, 
-          rotate: 15,
+          scale: 1.12, 
+          rotate: 12,
           boxShadow: "0 10px 30px rgba(184, 50, 96, 0.5)"
         }}
         whileTap={{ scale: 0.9 }}
         title={musicEnabled ? 'Music On' : 'Music Off'}
+        style={WILL_CHANGE.transform}
       >
         <span className="text-2xl drop-shadow-lg">{musicEnabled ? '🔊' : '🔇'}</span>
       </motion.button>
 
-      {/* Smooth Confetti Hearts - Optimized for performance */}
+      {/* Smooth Confetti Hearts - Optimized for performance (30 -> 22) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(30)].map((_, i) => {
-          const delay = (i * 0.15) % 3
-          const duration = 5 + (i % 3)
-          const xOffset = (i % 5) * 20
-          
-          return (
-            <motion.div
-              key={i}
-              className="absolute text-2xl sm:text-3xl drop-shadow-lg will-change-transform"
-              style={{
-                left: `${(i * 3.3) % 100}%`,
-                top: -50,
-              }}
-              animate={{
-                y: typeof window !== 'undefined' ? window.innerHeight + 100 : 900,
-                x: [
-                  0,
-                  Math.sin(i) * 150 + xOffset,
-                  Math.cos(i) * 100 - xOffset,
-                  0
-                ],
-                rotate: [0, 180, 360, 540],
-                scale: [0.7, 1, 0.9, 0.8],
-                opacity: [0, 0.9, 0.9, 0],
-              }}
-              transition={{
-                duration,
-                repeat: Infinity,
-                delay,
-                ease: 'linear',
-                times: [0, 0.3, 0.7, 1],
-              }}
-            >
-              {['❤️', '💕', '💖', '💗', '💝', '💘'][i % 6]}
-            </motion.div>
-          )
-        })}
+        {confettiHearts.map((heart, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-2xl sm:text-3xl drop-shadow-lg"
+            style={{
+              left: `${(i * 4.5) % 100}%`,
+              top: -50,
+              ...WILL_CHANGE.transformOpacity,
+            }}
+            animate={{
+              y: typeof window !== 'undefined' ? window.innerHeight + 100 : 900,
+              x: [
+                0,
+                Math.sin(i) * 140 + heart.xOffset,
+                Math.cos(i) * 90 - heart.xOffset,
+                0
+              ],
+              rotate: [0, 180, 360, 540],
+              scale: [0.7, 1, 0.9, 0.8],
+              opacity: [0, 0.85, 0.85, 0],
+            }}
+            transition={{
+              duration: heart.duration,
+              repeat: Infinity,
+              delay: heart.delay,
+              ease: 'linear',
+              times: [0, 0.3, 0.7, 1],
+            }}
+          >
+            {heart.emoji}
+          </motion.div>
+        ))}
       </div>
 
       {/* Main Content - Enhanced with ornate romantic styling */}
