@@ -239,13 +239,34 @@ Edit animation properties in component files or [tailwind.config.js](tailwind.co
 
 ## 🚀 Deployment
 
-This project can be deployed to various platforms:
+This project is optimized for deployment on various platforms:
 
-### Vercel
+### Vercel (Recommended)
+
+**Option 1: Deploy with Vercel CLI**
 ```bash
+# Install Vercel CLI globally
 npm install -g vercel
+
+# Deploy to Vercel
 vercel
+
+# Deploy to production
+vercel --prod
 ```
+
+**Option 2: Deploy via Vercel Dashboard**
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Go to [vercel.com](https://vercel.com) and sign in
+3. Click "New Project"
+4. Import your repository
+5. Vercel will automatically detect the framework and configure settings
+6. Click "Deploy"
+
+The project includes a `vercel.json` configuration file that ensures:
+- Correct build output directory (`dist`)
+- SPA routing support
+- Optimized build settings
 
 ### Netlify
 1. Connect your repository to Netlify

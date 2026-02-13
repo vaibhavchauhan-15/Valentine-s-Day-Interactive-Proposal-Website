@@ -119,7 +119,6 @@ const GiftBoxScreen = memo(({ onOpen }) => {
           {!isOpening && (
             <motion.div
               className="absolute inset-0 rounded-full bg-gradient-to-r from-deep-rose/35 via-valentine-pink/35 to-soft-gold/35"
-              style={WILL_CHANGE.transformOpacity}
               animate={{
                 scale: [1, 1.25, 1],
                 opacity: [0.3, 0.6, 0.3],
