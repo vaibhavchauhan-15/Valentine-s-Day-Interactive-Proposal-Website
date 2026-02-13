@@ -4,6 +4,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font face declarations with font-display optimization */
+@font-face {
+  font-family: 'DM Sans';
+  font-display: swap; /* Show fallback font immediately */
+  src: local('DM Sans');
+}
+
+@font-face {
+  font-family: 'Crimson Pro';
+  font-display: swap;
+  src: local('Crimson Pro');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-display: swap;
+  src: local('Cormorant Garamond');
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -365,7 +384,7 @@ button, .btn-romantic {
   transform: translateZ(0);
 }
 
-/* Reduce motion for accessibility */
+/* Reduce motion for accessibility and performance */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -374,6 +393,13 @@ button, .btn-romantic {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  
+  /* Disable parallax and complex transforms */
+  [style*="transform"],
+  .animate-float,
+  .animate-pulse {
+    transform: none !important;
   }
 }
 
@@ -389,5 +415,63 @@ button, .btn-romantic {
   button, a, [role="button"] {
     min-width: 44px;
     min-height: 44px;
+  }
+}
+
+/* Mobile Performance Optimizations */
+@media screen and (max-width: 768px) {
+  /* Simplify glass effects on mobile */
+  .glass-morphism,
+  .glass-romantic,
+  .glass-card {
+    backdrop-filter: blur(15px) saturate(120%);
+    -webkit-backdrop-filter: blur(15px) saturate(120%);
+  }
+  
+  /* Remove expensive cursor on mobile */
+  body {
+    cursor: auto !important;
+  }
+  
+  /* Simplify shadows on mobile */
+  .text-shadow-romantic,
+  .text-shadow-glow {
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Reduce animation complexity */
+  @keyframes shimmer {
+    0%, 100% { background-position: -200% 0; }
+    50% { background-position: 200% 0; }
+  }
+  
+  /* Optimize button will-change on mobile */
+  button, .btn-romantic {
+    will-change: auto;
+  }
+  
+  /* Reduce background complexity */
+  body {
+    background-image: none;
+    background-color: #FFF6EC;
+  }
+}
+
+/* Tablet Optimizations */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .glass-morphism,
+  .glass-romantic {
+    backdrop-filter: blur(25px) saturate(150%);
+    -webkit-backdrop-filter: blur(25px) saturate(150%);
+  }
+}
+
+/* High-performance devices only */
+@media screen and (min-width: 1025px) {
+  /* Enhanced effects for desktop */
+  .glass-morphism:hover,
+  .glass-romantic:hover {
+    backdrop-filter: blur(45px) saturate(220%);
+    -webkit-backdrop-filter: blur(45px) saturate(220%);
   }
 }

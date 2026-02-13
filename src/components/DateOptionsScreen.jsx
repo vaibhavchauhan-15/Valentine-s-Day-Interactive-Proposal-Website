@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, memo } from 'react'
+import LazyImage from './LazyImage'
 
 const DateOptionsScreen = memo(({ onSelect }) => {
   const [selectedOption, setSelectedOption] = useState(null)
@@ -71,27 +72,30 @@ const DateOptionsScreen = memo(({ onSelect }) => {
   ]
 
   const handleNonClickableHover = (optionId) => {
-    // Increase movement range with each attempt to make it progressively harder
-    const baseRange = 180
-    const multiplier = 1 + (buttonAttempts[optionId] * 0.5)
-    const range = baseRange * multiplier
-    
-    // Calculate random position, ensuring it moves significantly
-    const angle = Math.random() * Math.PI * 2
-    const distance = range * (0.5 + Math.random() * 0.5) // At least 50% of max range
-    
-    const randomX = Math.cos(angle) * distance
-    const randomY = Math.sin(angle) * distance
-    
-    setButtonPositions(prev => ({
-      ...prev,
-      [optionId]: { x: randomX, y: randomY }
-    }))
-    
-    setButtonAttempts(prev => ({
-      ...prev,
-      [optionId]: prev[optionId] + 1
-    }))
+    // Use RAF for performance-optimized button movement
+    requestAnimationFrame(() => {
+      // Increase movement range with each attempt to make it progressively harder
+      const baseRange = 180
+      const multiplier = 1 + (buttonAttempts[optionId] * 0.5)
+      const range = baseRange * multiplier
+      
+      // Calculate random position, ensuring it moves significantly
+      const angle = Math.random() * Math.PI * 2
+      const distance = range * (0.5 + Math.random() * 0.5) // At least 50% of max range
+      
+      const randomX = Math.cos(angle) * distance
+      const randomY = Math.sin(angle) * distance
+      
+      setButtonPositions(prev => ({
+        ...prev,
+        [optionId]: { x: randomX, y: randomY }
+      }))
+      
+      setButtonAttempts(prev => ({
+        ...prev,
+        [optionId]: prev[optionId] + 1
+      }))
+    })
   }
 
   const handleOptionClick = (option) => {
@@ -128,7 +132,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           >
-            <img 
+            <LazyImage 
               src="/animation/Dinner Animation.gif" 
               alt="Romantic Dinner" 
               className="w-full h-full object-cover"
@@ -492,7 +496,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
                 )}
                 
                 <div className="flex flex-col items-center gap-2 md:gap-3 relative z-10">
-                  <img 
+                  <LazyImage 
                     src={option.icon} 
                     alt={option.title}
                     className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 drop-shadow-2xl object-contain"

@@ -1,12 +1,33 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect, memo, useRef, useMemo } from 'react'
-import { EASING, DURATION, WILL_CHANGE } from '../constants/animations'
+import { EASING, DURATION, getWillChange } from '../constants/animations'
+import { useDeviceDetection } from '../utils/deviceDetection'
 
 const FinalScreen = memo(({ selectedOption }) => {
   const [displayedText, setDisplayedText] = useState('')
   const [musicEnabled, setMusicEnabled] = useState(true)
   const audioRef = useRef(null)
   const fullText = "Can't wait to spend Valentine's Day with you! ❤️"
+  
+  // Device detection for performance optimization
+  const { isMobile, isTablet, performanceTier } = useDeviceDetection()
+  
+  // Adaptive confetti count based on device
+  const confettiCount = useMemo(() => {
+    if (isMobile) return 8 // Mobile: 8 hearts
+    if (isTablet) return 12 // Tablet: 12 hearts
+    if (performanceTier === 'low') return 10 // Low-end: 10 hearts
+    return 22 // Desktop: 22 hearts
+  }, [isMobile, isTablet, performanceTier])
+  
+  // Simplify animations on mobile
+  const simplifyAnimations = useMemo(() => isMobile || performanceTier === 'low', [isMobile, performanceTier])
+  
+  // Smart will-change
+  const willChangeStyle = useMemo(() => 
+    getWillChange('transformOpacity', isMobile, performanceTier), 
+    [isMobile, performanceTier]
+  )
 
   // Typewriter effect - Optimized
   useEffect(() => {
@@ -34,16 +55,16 @@ const FinalScreen = memo(({ selectedOption }) => {
     }
   }, [musicEnabled])
 
-  // Auto-play music on mount
+  // Auto-play music on mount - Not on mobile to save battery
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && !isMobile) {
       audioRef.current.volume = 0.5
       audioRef.current.play().catch(err => {
         console.log('Auto-play failed:', err)
         setMusicEnabled(false)
       })
     }
-  }, [])
+  }, [isMobile])
 
   const optionMessages = {
     movie: '🎬 Movie night under the stars with you',
@@ -52,14 +73,14 @@ const FinalScreen = memo(({ selectedOption }) => {
     camping: '⛺ Camping under the stars together',
   }
 
-  // Memoize confetti configuration for better performance
+  // Memoize confetti configuration for better performance - Adaptive count
   const confettiHearts = useMemo(() => 
-    Array.from({ length: 22 }, (_, i) => ({
+    Array.from({ length: confettiCount }, (_, i) => ({
       delay: (i * 0.14) % 2.8,
-      duration: 4.5 + (i % 3) * 0.5,
+      duration: simplifyAnimations ? 5 + (i % 2) * 0.5 : 4.5 + (i % 3) * 0.5,
       xOffset: (i % 5) * 20,
       emoji: ['❤️', '💕', '💖', '💗', '💝', '💘'][i % 6]
-    })), [])
+    })), [confettiCount, simplifyAnimations])
 
   return (
     <motion.div
@@ -72,12 +93,12 @@ const FinalScreen = memo(({ selectedOption }) => {
       transition={{ duration: 2.5, ease: EASING.smooth }}
       className="fixed inset-0 flex flex-col items-center justify-center z-10 px-4"
     >
-      {/* Audio element */}
+      {/* Audio element - Lazy preload on desktop only */}
       <audio 
         ref={audioRef} 
         src="/song/song1.mp3" 
         loop 
-        preload="auto"
+        preload={isMobile ? "none" : "auto"}
       />
 
       {/* Enhanced Music control button */}
@@ -94,32 +115,36 @@ const FinalScreen = memo(({ selectedOption }) => {
         }}
         whileTap={{ scale: 0.9 }}
         title={musicEnabled ? 'Music On' : 'Music Off'}
-        style={WILL_CHANGE.transform}
+        style={willChangeStyle}
       >
         <span className="text-2xl drop-shadow-lg">{musicEnabled ? '🔊' : '🔇'}</span>
       </motion.button>
 
-      {/* Smooth Confetti Hearts - Optimized for performance (30 -> 22) */}
+      {/* Smooth Confetti Hearts - Adaptive count and simplified on mobile */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {confettiHearts.map((heart, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl sm:text-3xl drop-shadow-lg"
+            className={`absolute drop-shadow-lg ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}
             style={{
-              left: `${(i * 4.5) % 100}%`,
+              left: `${(i * (100 / confettiCount)) % 100}%`,
               top: -50,
-              ...WILL_CHANGE.transformOpacity,
+              ...willChangeStyle,
             }}
             animate={{
               y: typeof window !== 'undefined' ? window.innerHeight + 100 : 900,
-              x: [
+              x: simplifyAnimations ? [
+                0,
+                Math.sin(i) * 80 + heart.xOffset / 2,
+                0
+              ] : [
                 0,
                 Math.sin(i) * 140 + heart.xOffset,
                 Math.cos(i) * 90 - heart.xOffset,
                 0
               ],
-              rotate: [0, 180, 360, 540],
-              scale: [0.7, 1, 0.9, 0.8],
+              rotate: simplifyAnimations ? [0, 360] : [0, 180, 360, 540],
+              scale: simplifyAnimations ? [0.7, 1, 0.8] : [0.7, 1, 0.9, 0.8],
               opacity: [0, 0.85, 0.85, 0],
             }}
             transition={{
@@ -127,7 +152,7 @@ const FinalScreen = memo(({ selectedOption }) => {
               repeat: Infinity,
               delay: heart.delay,
               ease: 'linear',
-              times: [0, 0.3, 0.7, 1],
+              times: simplifyAnimations ? [0, 0.5, 1] : [0, 0.3, 0.7, 1],
             }}
           >
             {heart.emoji}

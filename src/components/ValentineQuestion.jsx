@@ -42,32 +42,35 @@ const ValentineQuestion = memo(({ onYes }) => {
   }), [])
 
   const handleNoHover = useCallback((e) => {
-    // Intelligent cursor-aware movement
+    // Intelligent cursor-aware movement with RAF optimization
     const button = noButtonRef.current
     if (!button) return
 
-    const rect = button.getBoundingClientRect()
-    const buttonCenterX = rect.left + rect.width / 2
-    const buttonCenterY = rect.top + rect.height / 2
-    
-    // Calculate direction away from cursor
-    const angle = Math.atan2(
-      buttonCenterY - e.clientY,
-      buttonCenterX - e.clientX
-    )
-    
-    // Increase distance with each attempt
-    const baseRange = 170
-    const multiplier = 1 + (noAttempts * 0.35)
-    const distance = baseRange * multiplier
-    
-    const randomX = Math.cos(angle) * distance + (Math.random() - 0.5) * 35
-    const randomY = Math.sin(angle) * distance + (Math.random() - 0.5) * 35
-    
-    setNoPosition({ x: randomX, y: randomY })
-    setNoAttempts(prev => prev + 1)
-    setShowTooltip(true)
-    setTimeout(() => setShowTooltip(false), 1800)
+    // Use RAF for smoother, optimized updates
+    requestAnimationFrame(() => {
+      const rect = button.getBoundingClientRect()
+      const buttonCenterX = rect.left + rect.width / 2
+      const buttonCenterY = rect.top + rect.height / 2
+      
+      // Calculate direction away from cursor
+      const angle = Math.atan2(
+        buttonCenterY - e.clientY,
+        buttonCenterX - e.clientX
+      )
+      
+      // Increase distance with each attempt
+      const baseRange = 170
+      const multiplier = 1 + (noAttempts * 0.35)
+      const distance = baseRange * multiplier
+      
+      const randomX = Math.cos(angle) * distance + (Math.random() - 0.5) * 35
+      const randomY = Math.sin(angle) * distance + (Math.random() - 0.5) * 35
+      
+      setNoPosition({ x: randomX, y: randomY })
+      setNoAttempts(prev => prev + 1)
+      setShowTooltip(true)
+      setTimeout(() => setShowTooltip(false), 1800)
+    })
   }, [noAttempts])
 
   const handleNoClick = (e) => {

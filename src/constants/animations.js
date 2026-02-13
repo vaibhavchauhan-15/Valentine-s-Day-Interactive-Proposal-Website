@@ -199,6 +199,46 @@ export const WILL_CHANGE = {
   opacity: { willChange: 'opacity' },
   transformOpacity: { willChange: 'transform, opacity' },
   auto: { willChange: 'auto' },
+  none: {}, // Use when will-change is not needed
+}
+
+/**
+ * Smart will-change utility - only applies on desktop or high-performance devices
+ * @param {string} property - 'transform', 'opacity', 'transformOpacity', or 'auto'
+ * @param {boolean} isMobile - whether device is mobile
+ * @param {string} performanceTier - 'low', 'medium', or 'high'
+ * @returns {object} style object with will-change or empty object
+ */
+export const getWillChange = (property = 'transform', isMobile = false, performanceTier = 'high') => {
+  // Skip will-change on mobile or low-end devices to save memory
+  if (isMobile || performanceTier === 'low') {
+    return WILL_CHANGE.none
+  }
+  return WILL_CHANGE[property] || WILL_CHANGE.none
+}
+
+/**
+ * Temporarily apply will-change before animation, remove after
+ * Use with useEffect in components
+ */
+export const useAnimationWillChange = (ref, property = 'transform', duration = 1000) => {
+  if (typeof window === 'undefined' || !ref.current) return
+  
+  const element = ref.current
+  element.style.willChange = property
+  
+  const timeoutId = setTimeout(() => {
+    if (element) {
+      element.style.willChange = 'auto'
+    }
+  }, duration)
+  
+  return () => {
+    clearTimeout(timeoutId)
+    if (element) {
+      element.style.willChange = 'auto'
+    }
+  }
 }
 
 // Stagger configurations

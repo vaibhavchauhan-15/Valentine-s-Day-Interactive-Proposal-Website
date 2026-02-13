@@ -1,7 +1,9 @@
-import { useState, useEffect, memo, useCallback } from 'react'
+import { useState, useEffect, memo, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
 import { useThrottledMouseMove } from './hooks/useOptimizedAnimation'
 import { SCREEN_TRANSITIONS, DURATION, EASING, WILL_CHANGE } from './constants/animations'
+import { useDeviceDetection } from './utils/deviceDetection'
+import { preloadImagesWithPriority, CRITICAL_IMAGES, NORMAL_PRIORITY_IMAGES, LOW_PRIORITY_IMAGES } from './utils/imagePreloader'
 import PreloaderScreen from './components/PreloaderScreen'
 import GiftBoxScreen from './components/GiftBoxScreen'
 import ValentineQuestion from './components/ValentineQuestion'
@@ -14,30 +16,43 @@ function App() {
   const [screen, setScreen] = useState('gift') // gift, question, options, final
   const [selectedOption, setSelectedOption] = useState('')
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  
+  // Device detection for performance optimization
+  const { isMobile, isTablet, performanceTier } = useDeviceDetection()
+  const shouldUseParallax = useMemo(() => !isMobile && !isTablet, [isMobile, isTablet])
 
-  // Preloader effect
+  // Preloader effect with image preloading
   useEffect(() => {
+    // Start preloading images
+    preloadImagesWithPriority({
+      critical: CRITICAL_IMAGES,
+      normal: NORMAL_PRIORITY_IMAGES,
+      low: isMobile ? [] : LOW_PRIORITY_IMAGES, // Skip GIF on mobile
+    })
+    
     const timer = setTimeout(() => {
       setLoading(false)
     }, 1700)
     
     return () => clearTimeout(timer)
-  }, [])
+  }, [isMobile])
 
-  // Throttled mouse move handler for better performance
+  // Throttled mouse move handler for better performance - disabled on mobile
   const handleMouseMove = useCallback((e) => {
+    if (!shouldUseParallax) return
     const x = (e.clientX / window.innerWidth - 0.5) * 15
     const y = (e.clientY / window.innerHeight - 0.5) * 15
     setMousePosition({ x, y })
-  }, [])
+  }, [shouldUseParallax])
 
   const throttledMouseMove = useThrottledMouseMove(handleMouseMove, 50)
   
-  // Track mouse position for parallax effect
+  // Track mouse position for parallax effect - only on desktop
   useEffect(() => {
+    if (!shouldUseParallax) return
     window.addEventListener('mousemove', throttledMouseMove)
     return () => window.removeEventListener('mousemove', throttledMouseMove)
-  }, [throttledMouseMove])
+  }, [throttledMouseMove, shouldUseParallax])
 
   const handleGiftOpen = () => {
     setScreen('question')
@@ -65,48 +80,52 @@ function App() {
         {/* Main content - only show after loading */}
         {!loading && (
           <>
-            {/* Animated mesh gradient background with parallax - Optimized */}
+            {/* Animated mesh gradient background with parallax - Optimized for mobile */}
             <motion.div 
               className="absolute inset-0 bg-gradient-to-br from-deep-rose/20 via-blush/30 to-elegant-maroon/20"
               style={{
-                x: mousePosition.x,
-                y: mousePosition.y,
-                ...WILL_CHANGE.transform,
+                x: shouldUseParallax ? mousePosition.x : 0,
+                y: shouldUseParallax ? mousePosition.y : 0,
+                ...(shouldUseParallax && WILL_CHANGE.transform),
               }}
-              transition={{ type: 'spring', stiffness: 45, damping: 25 }}
+              transition={shouldUseParallax ? { type: 'spring', stiffness: 45, damping: 25 } : { duration: 0 }}
             />
             
-            {/* Slow animated gradient overlay - Optimized */}
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-tr from-valentine-pink/20 via-transparent to-soft-gold/10"
-              animate={{
-                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                opacity: [0.3, 0.5, 0.3],
-              }}
-              transition={{
-                duration: 14,
-                repeat: Infinity,
-                ease: 'linear'
-              }}
-              style={{ 
-                backgroundSize: '200% 200%',
-                ...WILL_CHANGE.opacity,
-              }}
-            />
+            {/* Slow animated gradient overlay - Simplified on mobile */}
+            {performanceTier !== 'low' && (
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-tr from-valentine-pink/20 via-transparent to-soft-gold/10"
+                animate={{
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{
+                  duration: isMobile ? 20 : 14,
+                  repeat: Infinity,
+                  ease: 'linear'
+                }}
+                style={{ 
+                  backgroundSize: '200% 200%',
+                  ...WILL_CHANGE.opacity,
+                }}
+              />
+            )}
             
-            {/* Blurred depth layer - Optimized */}
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-bl from-elegant-maroon/10 via-transparent to-deep-rose/10"
-              style={{
-                x: mousePosition.x * -0.4,
-                y: mousePosition.y * -0.4,
-                filter: 'blur(55px)',
-                ...WILL_CHANGE.transform,
-              }}
-              transition={{ type: 'spring', stiffness: 25, damping: 25 }}
-            />
+            {/* Blurred depth layer - Disabled on mobile for performance */}
+            {shouldUseParallax && (
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-bl from-elegant-maroon/10 via-transparent to-deep-rose/10"
+                style={{
+                  x: mousePosition.x * -0.4,
+                  y: mousePosition.y * -0.4,
+                  filter: 'blur(55px)',
+                  ...WILL_CHANGE.transform,
+                }}
+                transition={{ type: 'spring', stiffness: 25, damping: 25 }}
+              />
+            )}
       
-            <FloatingHearts />
+            <FloatingHearts isMobile={isMobile} isTablet={isTablet} performanceTier={performanceTier} />
             
             <AnimatePresence mode="wait">
               {screen === 'gift' && (
