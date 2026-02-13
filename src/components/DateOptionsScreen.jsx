@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, memo, useMemo } from 'react'
+import { useState, memo, useMemo, useRef, useEffect } from 'react'
 import { useDeviceDetection } from '../utils/deviceDetection'
 import LazyImage from './LazyImage'
 
@@ -7,6 +7,7 @@ const DateOptionsScreen = memo(({ onSelect }) => {
   const [selectedOption, setSelectedOption] = useState(null)
   const [showAnimation, setShowAnimation] = useState(false)
   const [animationType, setAnimationType] = useState(null)
+  const timeoutRef = useRef(null)
   
   // Device detection for mobile optimization
   const { isMobile, isTablet, prefersReducedMotion } = useDeviceDetection()
@@ -109,14 +110,29 @@ const DateOptionsScreen = memo(({ onSelect }) => {
       return
     }
     
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    
     setSelectedOption(option.id)
     setAnimationType(option.id)
     setShowAnimation(true)
     
-    setTimeout(() => {
+    // Call onSelect after animation with proper cleanup
+    timeoutRef.current = setTimeout(() => {
       onSelect(option.id)
-    }, 2500)
+    }, 2000) // Reduced from 2500ms for faster transition
   }
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   return (
     <motion.div
@@ -131,11 +147,12 @@ const DateOptionsScreen = memo(({ onSelect }) => {
       <AnimatePresence>
         {showAnimation && animationType === 'dinner' && (
           <motion.div 
+            key="dinner-animation"
             className="fixed inset-0 z-40 pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
           >
             <LazyImage 
               src="/animation/Dinner Animation.gif" 

@@ -86,9 +86,10 @@ function App() {
 
   const handleDateSelection = (option) => {
     setSelectedOption(option)
+    // Shorter delay for smoother transition
     setTimeout(() => {
       setScreen('final')
-    }, 2300)
+    }, 1200)
   }
 
   return (
