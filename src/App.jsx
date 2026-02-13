@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useCallback, useMemo } from 'react'
+import { useState, useEffect, memo, useCallback, useMemo, lazy, Suspense } from 'react'
 import { motion, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
 import { useThrottledMouseMove } from './hooks/useOptimizedAnimation'
 import { SCREEN_TRANSITIONS, DURATION, EASING, WILL_CHANGE } from './constants/animations'
@@ -6,10 +6,32 @@ import { useDeviceDetection } from './utils/deviceDetection'
 import { preloadImagesWithPriority, CRITICAL_IMAGES, NORMAL_PRIORITY_IMAGES, LOW_PRIORITY_IMAGES } from './utils/imagePreloader'
 import PreloaderScreen from './components/PreloaderScreen'
 import GiftBoxScreen from './components/GiftBoxScreen'
-import ValentineQuestion from './components/ValentineQuestion'
-import DateOptionsScreen from './components/DateOptionsScreen'
-import FinalScreen from './components/FinalScreen'
 import FloatingHearts from './components/FloatingHearts'
+
+// Lazy load non-critical screens for better code splitting
+const ValentineQuestion = lazy(() => import('./components/ValentineQuestion'))
+const DateOptionsScreen = lazy(() => import('./components/DateOptionsScreen'))
+const FinalScreen = lazy(() => import('./components/FinalScreen'))
+
+// Fallback component for lazy-loaded screens
+const ScreenFallback = memo(() => (
+  <div className="fixed inset-0 flex items-center justify-center z-10">
+    <motion.div
+      className="text-4xl"
+      animate={{
+        scale: [1, 1.2, 1],
+        rotate: [0, 10, -10, 0],
+      }}
+      transition={{
+        duration: 1,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    >
+      💕
+    </motion.div>
+  </div>
+))
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -138,33 +160,39 @@ function App() {
               )}
               
               {screen === 'question' && (
-                <motion.div
-                  key="question"
-                  {...SCREEN_TRANSITIONS.slideLeft}
-                >
-                  <ValentineQuestion onYes={handleYes} />
-                </motion.div>
+                <Suspense fallback={<ScreenFallback />}>
+                  <motion.div
+                    key="question"
+                    {...SCREEN_TRANSITIONS.slideLeft}
+                  >
+                    <ValentineQuestion onYes={handleYes} />
+                  </motion.div>
+                </Suspense>
               )}
               
               {screen === 'options' && (
-                <motion.div
-                  key="options"
-                  {...SCREEN_TRANSITIONS.slideUp}
-                >
-                  <DateOptionsScreen onSelect={handleDateSelection} />
-                </motion.div>
+                <Suspense fallback={<ScreenFallback />}>
+                  <motion.div
+                    key="options"
+                    {...SCREEN_TRANSITIONS.slideUp}
+                  >
+                    <DateOptionsScreen onSelect={handleDateSelection} />
+                  </motion.div>
+                </Suspense>
               )}
               
               {screen === 'final' && (
-                <motion.div
-                  key="final"
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: DURATION.slow, ease: EASING.smooth }}
-                >
-                  <FinalScreen selectedOption={selectedOption} />
-                </motion.div>
+                <Suspense fallback={<ScreenFallback />}>
+                  <motion.div
+                    key="final"
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: DURATION.slow, ease: EASING.smooth }}
+                  >
+                    <FinalScreen selectedOption={selectedOption} />
+                  </motion.div>
+                </Suspense>
               )}
             </AnimatePresence>
           </>

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, memo, useMemo, useCallback } from 'react'
 import { VARIANTS, EASING, DURATION, WILL_CHANGE, BUTTON_ANIMATIONS } from '../constants/animations'
+import { useDeviceDetection } from '../utils/deviceDetection'
 
 const ValentineQuestion = memo(({ onYes }) => {
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 })
@@ -8,6 +9,10 @@ const ValentineQuestion = memo(({ onYes }) => {
   const [showHeartDoor, setShowHeartDoor] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
   const noButtonRef = useRef(null)
+  
+  // Device detection for mobile optimization
+  const { isMobile, isTablet, prefersReducedMotion } = useDeviceDetection()
+  const shouldReduceAnimations = prefersReducedMotion || isMobile
 
   const cuteMessages = [
     "Aresure? 🥺",
@@ -58,9 +63,9 @@ const ValentineQuestion = memo(({ onYes }) => {
         buttonCenterX - e.clientX
       )
       
-      // Increase distance with each attempt
-      const baseRange = 170
-      const multiplier = 1 + (noAttempts * 0.35)
+      // Increase distance with each attempt (reduced on mobile)
+      const baseRange = isMobile ? 120 : 170
+      const multiplier = 1 + (noAttempts * (isMobile ? 0.25 : 0.35))
       const distance = baseRange * multiplier
       
       const randomX = Math.cos(angle) * distance + (Math.random() - 0.5) * 35
@@ -71,7 +76,7 @@ const ValentineQuestion = memo(({ onYes }) => {
       setShowTooltip(true)
       setTimeout(() => setShowTooltip(false), 1800)
     })
-  }, [noAttempts])
+  }, [noAttempts, isMobile])
 
   const handleNoClick = (e) => {
     e.preventDefault()
@@ -146,22 +151,24 @@ const ValentineQuestion = memo(({ onYes }) => {
         {/* Lace pattern overlay */}
         <div className="absolute inset-0 lace-pattern opacity-30 pointer-events-none" />
         
-        {/* Enhanced shimmer effect */}
-        <motion.div
-          className="absolute inset-0 opacity-20"
-          style={{
-            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)',
-            backgroundSize: '200% 100%',
-          }}
-          animate={{
-            backgroundPosition: ['-200% 0', '200% 0'],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        {/* Enhanced shimmer effect - Disabled on mobile for performance */}
+        {!isMobile && !shouldReduceAnimations && (
+          <motion.div
+            className="absolute inset-0 opacity-20"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)',
+              backgroundSize: '200% 100%',
+            }}
+            animate={{
+              backgroundPosition: ['-200% 0', '200% 0'],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        )}
         
         {/* Ornate corner flourishes */}
         {[
@@ -242,54 +249,62 @@ const ValentineQuestion = memo(({ onYes }) => {
           {/* Yes Button - Enhanced with better effects */}
           <motion.button
             onClick={handleYesClick}
-            whileHover={{ 
+            whileHover={!isMobile ? { 
               ...BUTTON_ANIMATIONS.hover,
               boxShadow: "0 20px 50px rgba(184, 50, 96, 0.5), 0 0 30px rgba(255, 77, 109, 0.4)",
-            }}
+            } : {}}
             whileTap={BUTTON_ANIMATIONS.tap}
-            className="relative bg-gradient-to-r from-deep-rose via-valentine-red to-coral-pink text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl transition-all duration-300 z-10 touch-manipulation min-w-[140px] overflow-hidden group border-2 border-white/30"
+            className="relative bg-gradient-to-r from-deep-rose via-valentine-red to-coral-pink text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-2xl transition-all duration-300 z-10 touch-manipulation min-w-[140px] sm:min-w-[160px] overflow-hidden group border-2 border-white/30"
             style={WILL_CHANGE.transform}
           >
-            {/* Animated gradient overlay */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/50 to-white/30"
-              animate={{
-                x: ['-100%', '100%'],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
+            {/* Animated gradient overlay - Desktop only */}
+            {!isMobile && !shouldReduceAnimations && (
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/50 to-white/30"
+                animate={{
+                  x: ['-100%', '100%'],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+            )}
             
-            {/* Glow effect */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              animate={{
-                boxShadow: [
-                  '0 0 20px rgba(255, 77, 109, 0.3) inset',
-                  '0 0 30px rgba(255, 77, 109, 0.6) inset',
-                  '0 0 20px rgba(255, 77, 109, 0.3) inset',
-                ],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
+            {/* Glow effect - Simplified on mobile */}
+            {!shouldReduceAnimations && (
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{
+                  boxShadow: isMobile ? [
+                    '0 0 15px rgba(255, 77, 109, 0.3) inset',
+                    '0 0 20px rgba(255, 77, 109, 0.5) inset',
+                    '0 0 15px rgba(255, 77, 109, 0.3) inset',
+                  ] : [
+                    '0 0 20px rgba(255, 77, 109, 0.3) inset',
+                    '0 0 30px rgba(255, 77, 109, 0.6) inset',
+                    '0 0 20px rgba(255, 77, 109, 0.3) inset',
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            )}
             
             <span className="relative z-10 flex items-center justify-center gap-2 drop-shadow-lg">
               Yes! ❤️
             </span>
           </motion.button>
 
-          {/* No Button - Enhanced with better styling */}
+          {/* No Button - Enhanced with better styling and optimized springs */}
           <div className="relative">
             <motion.button
               ref={noButtonRef}
-              onMouseEnter={handleNoHover}
+              onMouseEnter={!isMobile ? handleNoHover : undefined}
               onTouchStart={(e) => {
                 const touch = e.touches[0]
                 handleNoHover({ clientX: touch.clientX, clientY: touch.clientY })
@@ -302,29 +317,31 @@ const ValentineQuestion = memo(({ onYes }) => {
               }}
               transition={{ 
                 type: 'spring', 
-                stiffness: 300, 
+                stiffness: isMobile ? 100 : 120, // Optimized spring for mobile
                 damping: 20,
                 rotate: { duration: 0.3 }
               }}
               style={{ position: 'relative' }}
-              whileHover={{ 
+              whileHover={!isMobile ? { 
                 scale: 1.05,
                 boxShadow: "0 10px 30px rgba(156, 163, 175, 0.4)",
                 transition: { duration: 0.2 }
-              }}
-              className="bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-lg cursor-pointer transition-all touch-manipulation min-w-[140px] border-2 border-white/20 relative overflow-hidden"
+              } : {}}
+              className="bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-full text-lg sm:text-xl md:text-2xl font-bold shadow-lg cursor-pointer transition-all touch-manipulation min-w-[140px] sm:min-w-[160px] border-2 border-white/20 relative overflow-hidden"
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{
-                  x: ['-100%', '100%'],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
+              {!shouldReduceAnimations && (
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{
+                    x: ['-100%', '100%'],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              )}
               <span className="relative z-10">No 😢</span>
             </motion.button>
             
@@ -348,21 +365,21 @@ const ValentineQuestion = memo(({ onYes }) => {
           </div>
         </motion.div>
 
-        {/* Heart decorations */}
+        {/* Heart decorations - Simplified on mobile */}
         <motion.div 
           variants={itemVariants}
           className="flex justify-center gap-2 sm:gap-4 mt-6 sm:mt-8 relative z-10"
         >
-          {[...Array(5)].map((_, i) => (
+          {[...Array(isMobile ? 3 : 5)].map((_, i) => (
             <motion.span
               key={i}
               className="text-2xl sm:text-3xl drop-shadow-lg"
-              animate={{
+              animate={shouldReduceAnimations ? {} : {
                 y: [0, -10, 0],
                 rotate: [0, 12, -12, 0],
                 scale: [1, 1.08, 1],
               }}
-              transition={{
+              transition={shouldReduceAnimations ? {} : {
                 duration: 2.5,
                 repeat: Infinity,
                 delay: i * 0.15,

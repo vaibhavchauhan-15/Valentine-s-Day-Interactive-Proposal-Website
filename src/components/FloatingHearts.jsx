@@ -10,10 +10,10 @@ const FloatingHearts = memo(({ isMobile = false, isTablet = false, performanceTi
 
   // Adaptive heart count based on device - Optimized for performance
   const heartCount = useMemo(() => {
-    if (isMobile) return 4 // Mobile: 4 hearts
-    if (isTablet) return 6 // Tablet: 6 hearts
+    if (isMobile) return 5 // Mobile: 5 hearts (reduced for 60fps)
+    if (isTablet) return 7 // Tablet: 7 hearts
     if (performanceTier === 'low') return 5 // Low-end: 5 hearts
-    return 8 // Desktop: 8 hearts
+    return 12 // Desktop: 12 hearts
   }, [isMobile, isTablet, performanceTier])
 
   // Simplified animations for mobile devices

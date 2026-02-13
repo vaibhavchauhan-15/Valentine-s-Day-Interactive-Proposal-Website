@@ -175,25 +175,27 @@ const FinalScreen = memo(({ selectedOption }) => {
         {/* Lace pattern overlay */}
         <div className="absolute inset-0 lace-pattern opacity-20 pointer-events-none" />
         
-        {/* Enhanced shimmer effect */}
-        <motion.div
-          className="absolute inset-0 opacity-15"
-          style={{
-            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
-            backgroundSize: '200% 100%',
-          }}
-          animate={{
-            backgroundPosition: ['-200% 0', '200% 0'],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        {/* Enhanced shimmer effect - Disabled on mobile */}
+        {!shouldReduceAnimations && (
+          <motion.div
+            className="absolute inset-0 opacity-15"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
+              backgroundSize: '200% 100%',
+            }}
+            animate={{
+              backgroundPosition: ['-200% 0', '200% 0'],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        )}
         
-        {/* Ornate corner flourishes */}
-        {[
+        {/* Ornate corner flourishes - Reduced on mobile */}
+        {!isMobile && [
           { corner: 'top-4 left-4', rotate: 0 },
           { corner: 'top-4 right-4', rotate: 90 },
           { corner: 'bottom-4 left-4', rotate: -90 },
@@ -225,11 +227,11 @@ const FinalScreen = memo(({ selectedOption }) => {
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-romantic-300 to-transparent"
         />
         
-        {/* Floating hearts decoration inside card */}
-        {[...Array(6)].map((_, i) => (
+        {/* Floating hearts decoration inside card - Reduced on mobile */}
+        {!shouldReduceAnimations && [...Array(isMobile ? 3 : 6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-3xl opacity-15 pointer-events-none"
+            className="absolute text-2xl sm:text-3xl opacity-15 pointer-events-none"
             style={{
               left: `${15 + (i % 3) * 35}%`,
               top: `${20 + Math.floor(i / 3) * 60}%`,
@@ -422,14 +424,14 @@ const FinalScreen = memo(({ selectedOption }) => {
           "Every moment with you is my favorite moment" 💕
         </motion.p>
 
-        {/* Floating hearts around the card */}
-        {[...Array(8)].map((_, i) => (
+        {/* Floating hearts around the card - Reduced on mobile */}
+        {!shouldReduceAnimations && [...Array(isMobile ? 4 : 8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl sm:text-3xl md:text-4xl drop-shadow-lg"
+            className="absolute text-xl sm:text-2xl md:text-3xl lg:text-4xl drop-shadow-lg"
             style={{
-              left: `${(Math.cos((i * Math.PI * 2) / 8) + 1) * 50}%`,
-              top: `${(Math.sin((i * Math.PI * 2) / 8) + 1) * 50}%`,
+              left: `${(Math.cos((i * Math.PI * 2) / (isMobile ? 4 : 8)) + 1) * 50}%`,
+              top: `${(Math.sin((i * Math.PI * 2) / (isMobile ? 4 : 8)) + 1) * 50}%`,
             }}
             initial={{ scale: 0, opacity: 0 }}
             animate={{

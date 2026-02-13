@@ -1,18 +1,23 @@
 import { motion } from 'framer-motion'
 import { useState, memo, useMemo } from 'react'
 import { VARIANTS, EASING, DURATION, STAGGER, WILL_CHANGE } from '../constants/animations'
+import { useDeviceDetection } from '../utils/deviceDetection'
 
 const GiftBoxScreen = memo(({ onOpen }) => {
   const [isOpening, setIsOpening] = useState(false)
   const [isShaking, setIsShaking] = useState(false)
+  
+  // Device detection for mobile optimization
+  const { isMobile, prefersReducedMotion } = useDeviceDetection()
+  const shouldReduceAnimations = prefersReducedMotion || isMobile
 
-  // Memoize sparkle positions for consistent rendering
+  // Memoize sparkle positions for consistent rendering - Reduced count on mobile
   const sparklePositions = useMemo(() => 
-    Array.from({ length: 8 }, (_, i) => ({
-      left: `${50 + Math.cos((i * Math.PI * 2) / 8) * 30}%`,
-      top: `${50 + Math.sin((i * Math.PI * 2) / 8) * 30}%`,
+    Array.from({ length: isMobile ? 5 : 8 }, (_, i) => ({
+      left: `${50 + Math.cos((i * Math.PI * 2) / (isMobile ? 5 : 8)) * 30}%`,
+      top: `${50 + Math.sin((i * Math.PI * 2) / (isMobile ? 5 : 8)) * 30}%`,
       delay: i * 0.12,
-    })), [])
+    })), [isMobile])
 
   const handleClick = () => {
     setIsShaking(true)
@@ -115,8 +120,8 @@ const GiftBoxScreen = memo(({ onOpen }) => {
         }}
       >
         <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 drop-shadow-2xl">
-          {/* Enhanced glow effect */}
-          {!isOpening && (
+          {/* Enhanced glow effect - Simplified on mobile */}
+          {!isOpening && !shouldReduceAnimations && (
             <motion.div
               className="absolute inset-0 rounded-full bg-gradient-to-r from-deep-rose/35 via-valentine-pink/35 to-soft-gold/35"
               animate={{
@@ -151,13 +156,13 @@ const GiftBoxScreen = memo(({ onOpen }) => {
             />
           </motion.div>
 
-          {/* Hearts explosion when opening - Optimized burst */}
+          {/* Hearts explosion when opening - Reduced count on mobile (60% reduction) */}
           {isOpening && (
             <>
-              {Array.from({ length: 18 }, (_, i) => (
+              {Array.from({ length: isMobile ? 10 : 18 }, (_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute text-4xl sm:text-5xl"
+                  className="absolute text-3xl sm:text-4xl md:text-5xl"
                   style={{
                     top: '50%',
                     left: '50%',
@@ -166,8 +171,8 @@ const GiftBoxScreen = memo(({ onOpen }) => {
                   initial={{ scale: 0, x: 0, y: 0, opacity: 1, rotate: 0 }}
                   animate={{
                     scale: [0, 1.4, 1],
-                    x: Math.cos((i * Math.PI * 2) / 18) * 180,
-                    y: Math.sin((i * Math.PI * 2) / 18) * 180,
+                    x: Math.cos((i * Math.PI * 2) / (isMobile ? 10 : 18)) * (isMobile ? 140 : 180),
+                    y: Math.sin((i * Math.PI * 2) / (isMobile ? 10 : 18)) * (isMobile ? 140 : 180),
                     opacity: [1, 1, 0],
                     rotate: [0, 360 * (i % 2 === 0 ? 1 : -1)],
                   }}

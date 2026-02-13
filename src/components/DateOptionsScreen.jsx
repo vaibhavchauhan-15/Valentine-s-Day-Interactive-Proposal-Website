@@ -1,11 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, memo } from 'react'
+import { useState, memo, useMemo } from 'react'
+import { useDeviceDetection } from '../utils/deviceDetection'
 import LazyImage from './LazyImage'
 
 const DateOptionsScreen = memo(({ onSelect }) => {
   const [selectedOption, setSelectedOption] = useState(null)
   const [showAnimation, setShowAnimation] = useState(false)
   const [animationType, setAnimationType] = useState(null)
+  
+  // Device detection for mobile optimization
+  const { isMobile, isTablet, prefersReducedMotion } = useDeviceDetection()
+  const shouldReduceAnimations = prefersReducedMotion || isMobile
   
   // State for tracking position and attempts for non-dinner options
   const [buttonPositions, setButtonPositions] = useState({
@@ -74,9 +79,9 @@ const DateOptionsScreen = memo(({ onSelect }) => {
   const handleNonClickableHover = (optionId) => {
     // Use RAF for performance-optimized button movement
     requestAnimationFrame(() => {
-      // Increase movement range with each attempt to make it progressively harder
-      const baseRange = 180
-      const multiplier = 1 + (buttonAttempts[optionId] * 0.5)
+      // Increase movement range with each attempt (reduced on mobile)
+      const baseRange = isMobile ? 120 : 180
+      const multiplier = 1 + (buttonAttempts[optionId] * (isMobile ? 0.3 : 0.5))
       const range = baseRange * multiplier
       
       // Calculate random position, ensuring it moves significantly
@@ -151,8 +156,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
               🚗💨
             </motion.div>
             
-            {/* Road lines */}
-            {[...Array(5)].map((_, i) => (
+            {/* Road lines - Reduced count on mobile */}
+            {[...Array(isMobile ? 3 : 5)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute h-1 sm:h-2 bg-white"
@@ -203,11 +208,11 @@ const DateOptionsScreen = memo(({ onSelect }) => {
               </svg>
             </motion.div>
 
-            {/* Twinkling stars */}
-            {[...Array(20)].map((_, i) => (
+            {/* Twinkling stars - Reduced count on mobile */}
+            {[...Array(isMobile ? 8 : 20)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute text-2xl"
+                className="absolute text-xl sm:text-2xl"
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 60}%`,
@@ -240,8 +245,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
               <div className="text-6xl sm:text-7xl md:text-9xl">🎬</div>
             </motion.div>
             
-            {/* Popcorn falling */}
-            {[...Array(15)].map((_, i) => (
+            {/* Popcorn falling - Reduced count on mobile */}
+            {[...Array(isMobile ? 6 : 15)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute text-2xl sm:text-3xl md:text-4xl"
@@ -280,25 +285,27 @@ const DateOptionsScreen = memo(({ onSelect }) => {
         {/* Lace pattern overlay */}
         <div className="absolute inset-0 lace-pattern opacity-25 pointer-events-none" />
         
-        {/* Enhanced shimmer effect */}
-        <motion.div
-          className="absolute inset-0 opacity-15"
-          style={{
-            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
-            backgroundSize: '200% 100%',
-          }}
-          animate={{
-            backgroundPosition: ['-200% 0', '200% 0'],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        {/* Enhanced shimmer effect - Disabled on mobile */}
+        {!shouldReduceAnimations && (
+          <motion.div
+            className="absolute inset-0 opacity-15"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent)',
+              backgroundSize: '200% 100%',
+            }}
+            animate={{
+              backgroundPosition: ['-200% 0', '200% 0'],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        )}
         
-        {/* Ornate corner flourishes */}
-        {[
+        {/* Ornate corner flourishes - Reduced on mobile */}
+        {!isMobile && [
           { corner: 'top-3 left-3', rotate: 0 },
           { corner: 'top-3 right-3', rotate: 90 },
           { corner: 'bottom-3 left-3', rotate: -90 },
@@ -387,8 +394,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
                   ? { 
                       opacity: { delay: index * 0.15 },
                       scale: { delay: index * 0.15 },
-                      x: { type: 'spring', stiffness: 250, damping: 15 },
-                      y: { type: 'spring', stiffness: 250, damping: 15 }
+                      x: { type: 'spring', stiffness: isMobile ? 100 : 120, damping: 20 },
+                      y: { type: 'spring', stiffness: isMobile ? 100 : 120, damping: 20 }
                     }
                   : { 
                       delay: index * 0.15,
@@ -421,11 +428,11 @@ const DateOptionsScreen = memo(({ onSelect }) => {
                     style={{ filter: 'blur(25px)', zIndex: -1 }}
                   />
                   
-                  {/* Golden sparkles for dinner option */}
-                  {[...Array(3)].map((_, i) => (
+                  {/* Golden sparkles for dinner option - Reduced on mobile */}
+                  {[...Array(isMobile ? 2 : 3)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className="absolute text-xl"
+                      className="absolute text-lg sm:text-xl"
                       style={{
                         top: `${20 + i * 30}%`,
                         right: '-10px',
@@ -479,8 +486,8 @@ const DateOptionsScreen = memo(({ onSelect }) => {
                   }}
                 />
                 
-                {/* Shine effect */}
-                {option.isClickable && (
+                {/* Shine effect - Desktop only */}
+                {option.isClickable && !shouldReduceAnimations && (
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     animate={{
