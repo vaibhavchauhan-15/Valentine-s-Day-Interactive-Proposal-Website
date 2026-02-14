@@ -176,7 +176,7 @@ const FinalScreen = memo(({ selectedOption }) => {
         <div className="absolute inset-0 lace-pattern opacity-20 pointer-events-none" />
         
         {/* Enhanced shimmer effect - Disabled on mobile */}
-        {!shouldReduceAnimations && (
+        {!simplifyAnimations && (
           <motion.div
             className="absolute inset-0 opacity-15"
             style={{
@@ -228,7 +228,7 @@ const FinalScreen = memo(({ selectedOption }) => {
         />
         
         {/* Floating hearts decoration inside card - Reduced on mobile */}
-        {!shouldReduceAnimations && [...Array(isMobile ? 3 : 6)].map((_, i) => (
+        {!simplifyAnimations && [...Array(isMobile ? 3 : 6)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute text-2xl sm:text-3xl opacity-15 pointer-events-none"
@@ -425,7 +425,7 @@ const FinalScreen = memo(({ selectedOption }) => {
         </motion.p>
 
         {/* Floating hearts around the card - Reduced on mobile */}
-        {!shouldReduceAnimations && [...Array(isMobile ? 4 : 8)].map((_, i) => (
+        {!simplifyAnimations && [...Array(isMobile ? 4 : 8)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute text-xl sm:text-2xl md:text-3xl lg:text-4xl drop-shadow-lg"
